@@ -32,14 +32,16 @@ from src.etl_aena.extract import AEROPUERTOS
 
 RAW_DIR = Path("raw")
 
-CAMPOS_VIGILADOS = ["estado", "puerta", "salida_estimada", "mostrador"]
+CAMPOS_VIGILADOS = ["estado", "puerta", "salida_estimada", "mostrador", "terminal", "tipo_aeronave"]
 
 ESTADOS = {
     "BOR": "Embarcando",
-    "RET": "Retrasado",
-    "FIN": "Finalizado",
     "CER": "Cerrado",
-    "ULT": "Ult.Llamada",
+    "ULL": "Ult.Llamada",
+    "INI": "Facturación",
+    "EMB": "Embarcando",
+    "LSC": "Ult.Llamada",
+    "SCH": "Programado",
 }
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
