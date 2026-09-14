@@ -177,9 +177,9 @@ Para que se ejecute solo cada 10-15 minutos sin intervención, el repositorio ya
 - [x] Detección incremental de cambios por vuelo (sin duplicar el histórico completo en cada ejecución)
 - [x] Persistencia de estado por aeropuerto y ejecución automática vía GitHub Actions
 - [x] Manejo correcto de valores nulos/nunca-informados (`NaT`)
+- [x] Migrar `historico_vuelos.csv` a Parquet particionado por aeropuerto/día para reducir el peso del repositorio a medida que crece el histórico
 
 **Próximos pasos**
-- [ ] Migrar `historico_vuelos.csv` a Parquet particionado por aeropuerto/día para reducir el peso del repositorio a medida que crece el histórico
 - [ ] Añadir tests automatizados (`pytest`) para `extract`, `transform` y `load`
 - [ ] Dashboard de seguimiento (Streamlit o Grafana) sobre el histórico acumulado
 - [ ] Modelo de predicción de retrasos a partir del histórico de cambios de estado
