@@ -6,6 +6,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![Pandas](https://img.shields.io/badge/Pandas-3.0-150458?logo=pandas&logoColor=white)
+![PyArrow](https://img.shields.io/badge/PyArrow-Parquet-11557C?logo=apacheparquet&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-scheduled_ETL-2088FF?logo=githubactions&logoColor=white)
 ![Requests](https://img.shields.io/badge/Requests-HTTP_client-000000?logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)
@@ -44,7 +45,7 @@ flowchart LR
     end
 
     subgraph LOAD
-        E --> H[(historico_vuelos.csv<br/>append-only)]
+        E --> H[(historico_parquet/<br/>aeropuerto=IATA/fecha=AAAA-MM-DD/<br/>datos.parquet)]
         G --> I[(estado_actual/IATA.pkl)]
     end
 
@@ -67,7 +68,8 @@ flowchart LR
 - Trata `NaN`/`NaT` como iguales entre sí en la comparación — sin este detalle, dos vuelos sin hora estimada todavía generarían un "cambio" falso en cada ejecución.
 
 ### Load
-- Escribe **solo las filas de cambio** al final de `data/historico_vuelos.csv` (si no hay cambios, no se toca el archivo).
+- Escribe **solo las filas de cambio** en el histórico, ahora almacenado en **Parquet particionado al estilo Hive**: `data/historico_parquet/aeropuerto=<IATA>/fecha=<AAAA-MM-DD>/datos.parquet`.
+- Para evitar generar miles de archivos diminutos (que acaban rompiendo repositorios Git y sistemas de archivos), cada ejecución **consolida la partición del día**: lee el `datos.parquet` existente (si lo hay), concatena las filas nuevas y sobrescribe el archivo. Si no hay cambios, no se toca ninguna partición.
 - Sobrescribe la "foto completa" de cada aeropuerto en `data/estado_actual/<IATA>.pkl` (formato *pickle* para conservar tipos `datetime` exactos entre ejecuciones), que sirve de punto de comparación para la siguiente ejecución del Transform.
 
 ---
@@ -102,16 +104,26 @@ Por cada vuelo de salida capturado se extraen: **número de vuelo, aerolínea (I
 | Cliente HTTP | **requests** (con reintentos manuales) |
 | Orquestación / *scheduling* | **GitHub Actions** (`repository_dispatch` / `workflow_dispatch` en cron externo) |
 | Persistencia de estado | **Pickle** (`estado_actual/*.pkl`) por aeropuerto |
-| Almacén de histórico | **CSV append-only** (`historico_vuelos.csv`), UTF-8-sig |
+| Almacén de histórico | **Parquet particionado** al estilo Hive (`aeropuerto=IATA/fecha=AAAA-MM-DD/datos.parquet`) vía **pyarrow** |
 | Control de versiones de los datos | **Git** — cada ejecución hace commit de `data/` si hubo cambios |
 
-**Por qué esta pila y no otra:** el volumen de datos (11 llamadas cada 10-15 min, decenas de filas de cambio por ejecución) no justifica el coste operativo de un *data warehouse* gestionado, un orquestador como Airflow o un contenedor Docker persistente. GitHub Actions ya ofrece *scheduling*, cómputo efímero y almacenamiento (el propio repositorio Git) sin coste ni mantenimiento adicional, y pandas es más que suficiente para el volumen manejado. Esta es una decisión de **escala apropiada**, no una limitación: el diseño modular de `extract.py` / `transform.py` / `load.py` permite sustituir el CSV por Parquet particionado o el pickle por PostgreSQL sin tocar la lógica de negocio (ver [Roadmap](#-roadmap-y-estado-del-proyecto)).
+**Por qué esta pila y no otra:** el volumen de datos (11 llamadas cada 10-15 min, decenas de filas de cambio por ejecución) no justifica el coste operativo de un *data warehouse* gestionado, un orquestador como Airflow o un contenedor Docker persistente. GitHub Actions ya ofrece *scheduling*, cómputo efímero y almacenamiento (el propio repositorio Git) sin coste ni mantenimiento adicional, y pandas es más que suficiente para el volumen manejado. Esta es una decisión de **escala apropiada**, no una limitación: el diseño modular de `extract.py` / `transform.py` / `load.py` ya ha permitido sustituir el CSV *append-only* original por Parquet particionado (ver [Roadmap](#-roadmap-y-estado-del-proyecto)) sin tocar la lógica de negocio de Extract ni Transform, y permitiría igualmente sustituir el pickle por PostgreSQL el día que el volumen lo justifique.
 
 ---
 
 ## 🗃️ Modelo de datos y calidad
 
-**`data/historico_vuelos.csv`** — histórico *append-only* de cambios, un registro por evento detectado:
+**`data/historico_parquet/`** — histórico incremental de cambios, particionado por `aeropuerto` y `fecha` (una fila por evento detectado):
+
+```
+data/historico_parquet/
+├── aeropuerto=MAD/
+│   ├── fecha=2026-09-14/datos.parquet
+│   └── fecha=2026-09-15/datos.parquet
+├── aeropuerto=BCN/
+│   └── fecha=2026-09-14/datos.parquet
+...
+```
 
 | Columna | Tipo | Descripción |
 |---|---|---|
@@ -124,6 +136,18 @@ Por cada vuelo de salida capturado se extraen: **número de vuelo, aerolínea (I
 | `terminal`, `puerta`, `mostrador`, `tipo_aeronave` | str | Detalles operativos |
 | `detectado_en` | datetime | Instante en que el pipeline detectó el cambio |
 
+El particionado por `aeropuerto`/`fecha` permite leer solo lo necesario con `pandas.read_parquet()` (o cualquier motor compatible con particiones Hive, como DuckDB), en vez de cargar el histórico completo en memoria:
+
+```python
+import pandas as pd
+
+# Solo el histórico de Sevilla del 14 de septiembre de 2026
+df = pd.read_parquet("data/historico_parquet/aeropuerto=SVQ/fecha=2026-09-14/")
+
+# Todo el histórico disponible (todas las particiones)
+df_todo = pd.read_parquet("data/historico_parquet/")
+```
+
 **`data/estado_actual/<IATA>.pkl`** — última foto completa de todos los vuelos vistos de ese aeropuerto (uso interno, no pensado para lectura directa).
 
 **Reglas de calidad implementadas:**
@@ -132,6 +156,7 @@ Por cada vuelo de salida capturado se extraen: **número de vuelo, aerolínea (I
 - **Comparación robusta de nulos**: `NaN`/`NaT` se tratan como iguales entre sí para no generar falsos positivos de "cambio" en vuelos sin hora estimada todavía.
 - **Tolerancia a fallos por aeropuerto**: si falla la extracción de uno, el resto continúa; el aeropuerto fallido simplemente no actualiza su estado en esa ejecución.
 - **Reintentos de red** (hasta 2 intentos, con espera entre ellos) y manejo explícito de `JSONDecodeError` si AENA responde con contenido no válido.
+- **Consolidación de particiones**: en vez de añadir un archivo Parquet nuevo por ejecución, cada corrida reescribe la partición del día combinando lo existente con los cambios nuevos, manteniendo acotado el número de archivos por aeropuerto/día.
 
 ---
 
@@ -153,20 +178,17 @@ pip install -r requirements.txt
 python main.py
 ```
 
-Tras la ejecución, revisa `data/historico_vuelos.csv` (cambios detectados) y `data/estado_actual/` (foto completa por aeropuerto). No se necesita ninguna clave de API ni variable de entorno.
+Tras la ejecución, revisa `data/historico_parquet/` (cambios detectados, particionados por `aeropuerto`/`fecha`) y `data/estado_actual/` (foto completa por aeropuerto). No se necesita ninguna clave de API ni variable de entorno.
 
 Para que se ejecute solo cada 10-15 minutos sin intervención, el repositorio ya incluye el workflow `.github/workflows/etl.yml`, que instala dependencias, corre `main.py` y hace commit/push de `data/` automáticamente si hubo cambios.
+
+> 📎 El repositorio incluye además `migrar_a_parquet.py`, un script de un solo uso ya ejecutado que migró el histórico original en `historico_vuelos.csv` al formato Parquet particionado actual. Se mantiene en el repo como referencia, pero no forma parte del pipeline recurrente.
 
 ---
 
 ## 📊 Insights (muestra del histórico acumulado)
 
-> Cifras calculadas sobre la ventana de datos disponible en este repositorio en el momento de escribir esto (~21 horas de captura continua, más de 56.000 eventos registrados). Se irán consolidando a medida que el histórico crezca.
-
-- **Más de 6 de cada 10 vuelos de salida registran al menos un cambio de estado, puerta o mostrador** antes de despegar — confirmando que el panel "en vivo" cambia con mucha más frecuencia de lo que sugiere la hora programada inicial.
-- De los vuelos con retraso detectado (`salida_estimada` > `salida_programada` + 5 min), **Sevilla y Menorca presentan el retraso medio más alto (~36 min)**, mientras que **Tenerife Norte es el más puntual de los 11 (~15 min de retraso medio)**.
-- En Madrid, el **25,2%** de los vuelos únicos observados sufrió un retraso superior a 5 minutos frente al **22,5%** en Barcelona, los dos aeropuertos con más volumen de la red.
-- La franja horaria con más eventos de cambio de estado se concentra entre las **10:00 y las 16:00**, coincidiendo con la mayor densidad de salidas programadas del día.
+> Por completar
 
 ---
 
