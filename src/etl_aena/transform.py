@@ -28,7 +28,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.etl_aena.extract import AEROPUERTOS
+from src.etl_aena.extract import AEROPUERTOS, ahora_espana
 
 RAW_DIR = Path("raw")
 
@@ -181,7 +181,12 @@ def detectar_cambios(
                 vuelos vistos de ese aeropuerto (para pasárselo a la
                 siguiente ejecución).
     """
-    ahora = pd.Timestamp.now()
+    # Usamos ahora_espana() (hora de Europe/Madrid) en vez de
+    # pd.Timestamp.now(), que devolvía la hora UTC del runner de GitHub
+    # Actions. Con pd.Timestamp.now() la partición de fecha en
+    # historico_parquet/ cambiaba hasta 2 horas más tarde que la
+    # medianoche real en España.
+    ahora = pd.Timestamp(ahora_espana())
 
     if df_nuevo.empty:
         logger.info("La extracción no trae vuelos.")

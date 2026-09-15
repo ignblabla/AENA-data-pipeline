@@ -3,32 +3,14 @@ extract.py
 ----------
 Fase EXTRACT del ETL de vuelos de salida de los 11 grandes aeropuertos
 de España.
-
-Responsabilidad única de este módulo: llamar al endpoint interno de Aena
-para cada aeropuerto y guardar la respuesta cruda (sin transformar) en
-disco, en una subcarpeta por aeropuerto, con un nombre de archivo basado
-en el timestamp de la extracción.
-
-Pensado para ejecutarse cada 10-15 minutos de forma continua (vía cron,
-scheduler, etc.), por lo que además de la subcarpeta por aeropuerto se
-añade una subcarpeta por día, para que ninguna carpeta acumule
-decenas de miles de ficheros y el archivado/borrado por antigüedad sea
-sencillo.
-
-Cada ejecución genera un archivo nuevo en raw/<CODIGO_IATA>/<AAAA-MM-DD>/,
-p.ej.:
-    raw/SVQ/2026-09-10/14-30-05.json
-    raw/MAD/2026-09-10/14-30-07.json
-
-Esto nos permite, en la fase Transform posterior, comparar extracciones
-consecutivas de un mismo aeropuerto y detectar cambios (estado del
-vuelo, puerta, hora estimada...).
+...
 """
 
 import json
 import logging
 import time
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 import requests
 
@@ -37,6 +19,8 @@ import requests
 BASE_URL = "https://www.aena.es/sites/Satellite"
 FLIGHT_TYPE = "S"  # S = Salidas
 DOS_DIAS = "si"
+
+ZONA_ESPANA = ZoneInfo("Europe/Madrid")
 
 AEROPUERTOS = {
     "MAD": "Madrid-Barajas",
@@ -79,6 +63,21 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
 logger = logging.getLogger(__name__)
+
+
+def ahora_espana() -> datetime:
+    """
+    Hora actual en huso horario de España (Europe/Madrid), naive
+    (sin tzinfo) para que .strftime() e .isoformat() se comporten
+    igual que antes en el resto del código.
+
+    Usamos esto en vez de datetime.now() porque los runners de
+    GitHub Actions corren en UTC: con datetime.now() a secas, la
+    carpeta de "día" cambiaba con hasta 2 horas de retraso respecto
+    al día real en España (ej. a la 01:00 hora española seguía
+    escribiendo en la carpeta del día anterior).
+    """
+    return datetime.now(ZONA_ESPANA).replace(tzinfo=None)
 
 
 # --- Extracción ----------------------------------------------------------
@@ -135,7 +134,7 @@ def guardar_raw(airport_code: str, datos: list[dict]) -> Path:
     10-15 minutos de forma continua, y facilita el archivado/borrado
     por antigüedad (basta con operar sobre carpetas de día completas).
     """
-    ahora = datetime.now()
+    ahora = ahora_espana()
     carpeta_dia = RAW_DIR / airport_code / ahora.strftime("%Y-%m-%d")
     carpeta_dia.mkdir(parents=True, exist_ok=True)
 
@@ -169,7 +168,7 @@ def listar_extracciones(airport_code: str, dia: str | None = None) -> list[Path]
     Pensado para que la fase Transform pueda comparar extracciones
     consecutivas sin tener que rebuscar entre todo el histórico.
     """
-    dia = dia or datetime.now().strftime("%Y-%m-%d")
+    dia = dia or ahora_espana().strftime("%Y-%m-%d")
     carpeta_dia = RAW_DIR / airport_code / dia
     if not carpeta_dia.exists():
         return []
