@@ -48,7 +48,7 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Actualizar datos ETL $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git commit -m "Actualizar datos ETL $(TZ='Europe/Madrid' date +'%Y-%m-%d %H:%M %Z')"
 
           max_attempts=5
           attempt=1
