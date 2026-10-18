@@ -1,0 +1,28 @@
+/* Planos de fondo: la página un paso por debajo de las tarjetas */
+:root[data-mantine-color-scheme='light'] {
+  --mantine-color-body: #f9f9f7;
+}
+
+.enlace-nav {
+  padding: 6px 12px;
+  border-radius: var(--mantine-radius-md);
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 500;
+  color: var(--mantine-color-dimmed);
+  text-decoration: none;
+}
+
+.enlace-nav:hover {
+  background: var(--mantine-color-default-hover);
+}
+
+.enlace-nav.active {
+  color: var(--mantine-color-text);
+  background: var(--mantine-color-default-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

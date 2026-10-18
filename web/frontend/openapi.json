@@ -1,0 +1,2176 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AENA · API de exploración",
+    "description": "Métricas de los vuelos de salida de los 11 principales aeropuertos de España, calculadas a partir del histórico del pipeline ETL.",
+    "version": "0.3.0"
+  },
+  "paths": {
+    "/api/meta": {
+      "get": {
+        "tags": [
+          "meta"
+        ],
+        "summary": "Aeropuertos y periodo disponible",
+        "operationId": "meta_api_meta_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Meta"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/resumen": {
+      "get": {
+        "tags": [
+          "resumen"
+        ],
+        "summary": "Indicadores clave del periodo",
+        "operationId": "resumen_api_resumen_get",
+        "parameters": [
+          {
+            "name": "desde",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Primer día (AAAA-MM-DD). Por defecto, el primer día completo.",
+              "title": "Desde"
+            },
+            "description": "Primer día (AAAA-MM-DD). Por defecto, el primer día completo."
+          },
+          {
+            "name": "hasta",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Último día (AAAA-MM-DD). Por defecto, el último día completo.",
+              "title": "Hasta"
+            },
+            "description": "Último día (AAAA-MM-DD). Por defecto, el último día completo."
+          },
+          {
+            "name": "aeropuertos",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Códigos IATA. Vacío = todos.",
+              "title": "Aeropuertos"
+            },
+            "description": "Códigos IATA. Vacío = todos."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Resumen"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/series/temporal": {
+      "get": {
+        "tags": [
+          "series"
+        ],
+        "summary": "Métricas por día, semana o mes",
+        "description": "Con agrupar=total, una fila por periodo sumando los aeropuertos filtrados\n(aeropuerto = null). `completo` indica si el periodo tiene todos sus días\ndentro del rango filtrado: una semana o mes a medias no es comparable.",
+        "operationId": "serie_temporal_api_series_temporal_get",
+        "parameters": [
+          {
+            "name": "granularidad",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "dia",
+                "semana",
+                "mes"
+              ],
+              "type": "string",
+              "default": "dia",
+              "title": "Granularidad"
+            }
+          },
+          {
+            "name": "agrupar",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "aeropuerto",
+                "total"
+              ],
+              "type": "string",
+              "default": "aeropuerto",
+              "title": "Agrupar"
+            }
+          },
+          {
+            "name": "desde",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Primer día (AAAA-MM-DD). Por defecto, el primer día completo.",
+              "title": "Desde"
+            },
+            "description": "Primer día (AAAA-MM-DD). Por defecto, el primer día completo."
+          },
+          {
+            "name": "hasta",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Último día (AAAA-MM-DD). Por defecto, el último día completo.",
+              "title": "Hasta"
+            },
+            "description": "Último día (AAAA-MM-DD). Por defecto, el último día completo."
+          },
+          {
+            "name": "aeropuertos",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Códigos IATA. Vacío = todos.",
+              "title": "Aeropuertos"
+            },
+            "description": "Códigos IATA. Vacío = todos."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PuntoSerie"
+                  },
+                  "title": "Response Serie Temporal Api Series Temporal Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rankings/aeropuertos": {
+      "get": {
+        "tags": [
+          "rankings"
+        ],
+        "summary": "Métricas por aeropuerto",
+        "operationId": "ranking_aeropuertos_api_rankings_aeropuertos_get",
+        "parameters": [
+          {
+            "name": "metrica",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "salidas",
+                "retraso_medio",
+                "tasa_cancelacion",
+                "tasa_puntualidad"
+              ],
+              "type": "string",
+              "default": "salidas",
+              "title": "Metrica"
+            }
+          },
+          {
+            "name": "desde",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Primer día (AAAA-MM-DD). Por defecto, el primer día completo.",
+              "title": "Desde"
+            },
+            "description": "Primer día (AAAA-MM-DD). Por defecto, el primer día completo."
+          },
+          {
+            "name": "hasta",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Último día (AAAA-MM-DD). Por defecto, el último día completo.",
+              "title": "Hasta"
+            },
+            "description": "Último día (AAAA-MM-DD). Por defecto, el último día completo."
+          },
+          {
+            "name": "aeropuertos",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Códigos IATA. Vacío = todos.",
+              "title": "Aeropuertos"
+            },
+            "description": "Códigos IATA. Vacío = todos."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetricasAeropuerto"
+                  },
+                  "title": "Response Ranking Aeropuertos Api Rankings Aeropuertos Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rankings/destinos": {
+      "get": {
+        "tags": [
+          "rankings"
+        ],
+        "summary": "Destinos con más salidas",
+        "operationId": "ranking_destinos_api_rankings_destinos_get",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 10,
+              "title": "Limite"
+            }
+          },
+          {
+            "name": "desde",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Primer día (AAAA-MM-DD). Por defecto, el primer día completo.",
+              "title": "Desde"
+            },
+            "description": "Primer día (AAAA-MM-DD). Por defecto, el primer día completo."
+          },
+          {
+            "name": "hasta",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Último día (AAAA-MM-DD). Por defecto, el último día completo.",
+              "title": "Hasta"
+            },
+            "description": "Último día (AAAA-MM-DD). Por defecto, el último día completo."
+          },
+          {
+            "name": "aeropuertos",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Códigos IATA. Vacío = todos.",
+              "title": "Aeropuertos"
+            },
+            "description": "Códigos IATA. Vacío = todos."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RankingDestino"
+                  },
+                  "title": "Response Ranking Destinos Api Rankings Destinos Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rankings/aerolineas": {
+      "get": {
+        "tags": [
+          "rankings"
+        ],
+        "summary": "Aerolíneas con más vuelos",
+        "operationId": "ranking_aerolineas_api_rankings_aerolineas_get",
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 10,
+              "title": "Limite"
+            }
+          },
+          {
+            "name": "desde",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Primer día (AAAA-MM-DD). Por defecto, el primer día completo.",
+              "title": "Desde"
+            },
+            "description": "Primer día (AAAA-MM-DD). Por defecto, el primer día completo."
+          },
+          {
+            "name": "hasta",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Último día (AAAA-MM-DD). Por defecto, el último día completo.",
+              "title": "Hasta"
+            },
+            "description": "Último día (AAAA-MM-DD). Por defecto, el último día completo."
+          },
+          {
+            "name": "aeropuertos",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Códigos IATA. Vacío = todos.",
+              "title": "Aeropuertos"
+            },
+            "description": "Códigos IATA. Vacío = todos."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RankingAerolinea"
+                  },
+                  "title": "Response Ranking Aerolineas Api Rankings Aerolineas Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/aeropuertos/{iata}/horario": {
+      "get": {
+        "tags": [
+          "aeropuertos"
+        ],
+        "summary": "Métricas por día de la semana y hora",
+        "description": "Una celda por (día de la semana, hora programada) para el mapa de calor.",
+        "operationId": "horario_api_aeropuertos__iata__horario_get",
+        "parameters": [
+          {
+            "name": "iata",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Iata"
+            }
+          },
+          {
+            "name": "desde",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Primer día (AAAA-MM-DD). Por defecto, el primer día completo.",
+              "title": "Desde"
+            },
+            "description": "Primer día (AAAA-MM-DD). Por defecto, el primer día completo."
+          },
+          {
+            "name": "hasta",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Último día (AAAA-MM-DD). Por defecto, el último día completo.",
+              "title": "Hasta"
+            },
+            "description": "Último día (AAAA-MM-DD). Por defecto, el último día completo."
+          },
+          {
+            "name": "aeropuertos",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Códigos IATA. Vacío = todos.",
+              "title": "Aeropuertos"
+            },
+            "description": "Códigos IATA. Vacío = todos."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CeldaHorario"
+                  },
+                  "title": "Response Horario Api Aeropuertos  Iata  Horario Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/aeropuertos/{iata}/retrasos": {
+      "get": {
+        "tags": [
+          "aeropuertos"
+        ],
+        "summary": "Distribución del retraso estimado",
+        "operationId": "retrasos_api_aeropuertos__iata__retrasos_get",
+        "parameters": [
+          {
+            "name": "iata",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Iata"
+            }
+          },
+          {
+            "name": "desde",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Primer día (AAAA-MM-DD). Por defecto, el primer día completo.",
+              "title": "Desde"
+            },
+            "description": "Primer día (AAAA-MM-DD). Por defecto, el primer día completo."
+          },
+          {
+            "name": "hasta",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Último día (AAAA-MM-DD). Por defecto, el último día completo.",
+              "title": "Hasta"
+            },
+            "description": "Último día (AAAA-MM-DD). Por defecto, el último día completo."
+          },
+          {
+            "name": "aeropuertos",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Códigos IATA. Vacío = todos.",
+              "title": "Aeropuertos"
+            },
+            "description": "Códigos IATA. Vacío = todos."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistogramaRetrasos"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rutas": {
+      "get": {
+        "tags": [
+          "rutas"
+        ],
+        "summary": "Salidas por ruta (aeropuerto de origen → destino)",
+        "description": "Una fila por par origen-destino, con las coordenadas del destino para el\nmapa. Los destinos sin coordenadas conocidas llegan con lat/lon = null.",
+        "operationId": "rutas_api_rutas_get",
+        "parameters": [
+          {
+            "name": "desde",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Primer día (AAAA-MM-DD). Por defecto, el primer día completo.",
+              "title": "Desde"
+            },
+            "description": "Primer día (AAAA-MM-DD). Por defecto, el primer día completo."
+          },
+          {
+            "name": "hasta",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Último día (AAAA-MM-DD). Por defecto, el último día completo.",
+              "title": "Hasta"
+            },
+            "description": "Último día (AAAA-MM-DD). Por defecto, el último día completo."
+          },
+          {
+            "name": "aeropuertos",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Códigos IATA. Vacío = todos.",
+              "title": "Aeropuertos"
+            },
+            "description": "Códigos IATA. Vacío = todos."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ruta"
+                  },
+                  "title": "Response Rutas Api Rutas Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/directo/{iata}": {
+      "get": {
+        "tags": [
+          "directo"
+        ],
+        "summary": "Panel de salidas según la última foto del pipeline",
+        "description": "Lo que mostraba el panel de AENA en la última extracción (data/estado_actual),\nagrupando los códigos compartidos en una sola fila. Incluye los vuelos cuya\nhora (estimada o programada) no ha pasado hace más de MARGEN_PANEL_MIN.",
+        "operationId": "panel_api_directo__iata__get",
+        "parameters": [
+          {
+            "name": "iata",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Iata"
+            }
+          },
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 80,
+              "title": "Limite"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PanelDirecto"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vuelos/historial": {
+      "get": {
+        "tags": [
+          "directo"
+        ],
+        "summary": "Todos los cambios detectados de un vuelo",
+        "operationId": "historial_api_vuelos_historial_get",
+        "parameters": [
+          {
+            "name": "clave",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "clave_vuelo, p. ej. MAD_3166_17/10/2026_20:00:00_LHR",
+              "title": "Clave"
+            },
+            "description": "clave_vuelo, p. ej. MAD_3166_17/10/2026_20:00:00_LHR"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorialVuelo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/salud": {
+      "get": {
+        "tags": [
+          "meta"
+        ],
+        "summary": "Comprobación de que la API está viva",
+        "operationId": "salud_api_salud_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Aeropuerto": {
+        "properties": {
+          "iata": {
+            "type": "string",
+            "title": "Iata"
+          },
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "ciudad": {
+            "type": "string",
+            "title": "Ciudad"
+          },
+          "lat": {
+            "type": "number",
+            "title": "Lat"
+          },
+          "lon": {
+            "type": "number",
+            "title": "Lon"
+          }
+        },
+        "type": "object",
+        "required": [
+          "iata",
+          "nombre",
+          "ciudad",
+          "lat",
+          "lon"
+        ],
+        "title": "Aeropuerto"
+      },
+      "Cambio": {
+        "properties": {
+          "campo": {
+            "type": "string",
+            "enum": [
+              "estado",
+              "puerta",
+              "salida_estimada",
+              "mostrador",
+              "terminal",
+              "tipo_aeronave"
+            ],
+            "title": "Campo"
+          },
+          "antes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Antes",
+            "description": "Valor anterior (fechas en ISO 8601; el estado, con su nombre legible)"
+          },
+          "despues": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Despues"
+          }
+        },
+        "type": "object",
+        "required": [
+          "campo",
+          "antes",
+          "despues"
+        ],
+        "title": "Cambio"
+      },
+      "CeldaHorario": {
+        "properties": {
+          "salidas": {
+            "type": "integer",
+            "title": "Salidas",
+            "description": "Salidas físicas (sin duplicar códigos compartidos)"
+          },
+          "vuelos": {
+            "type": "integer",
+            "title": "Vuelos",
+            "description": "Vuelos comerciales (cada número de vuelo cuenta)"
+          },
+          "cancelados": {
+            "type": "integer",
+            "title": "Cancelados",
+            "description": "Salidas físicas canceladas"
+          },
+          "tasa_cancelacion": {
+            "type": "number",
+            "title": "Tasa Cancelacion",
+            "description": "Fracción 0-1"
+          },
+          "retraso_medio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retraso Medio",
+            "description": "Minutos, según la hora estimada"
+          },
+          "tasa_puntualidad": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tasa Puntualidad",
+            "description": "Fracción 0-1 de salidas con retraso estimado ≤ umbral"
+          },
+          "dia_semana": {
+            "type": "integer",
+            "title": "Dia Semana",
+            "description": "1 = lunes … 7 = domingo"
+          },
+          "hora": {
+            "type": "integer",
+            "title": "Hora",
+            "description": "Hora programada de salida, 0-23"
+          },
+          "salidas_por_dia": {
+            "type": "number",
+            "title": "Salidas Por Dia",
+            "description": "Media de salidas en esa franja por cada día de la semana del periodo"
+          }
+        },
+        "type": "object",
+        "required": [
+          "salidas",
+          "vuelos",
+          "cancelados",
+          "tasa_cancelacion",
+          "retraso_medio",
+          "tasa_puntualidad",
+          "dia_semana",
+          "hora",
+          "salidas_por_dia"
+        ],
+        "title": "CeldaHorario"
+      },
+      "CodigoVuelo": {
+        "properties": {
+          "clave_vuelo": {
+            "type": "string",
+            "title": "Clave Vuelo"
+          },
+          "num_vuelo": {
+            "type": "string",
+            "title": "Num Vuelo"
+          },
+          "iata_compania": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iata Compania"
+          },
+          "aerolinea": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aerolinea"
+          }
+        },
+        "type": "object",
+        "required": [
+          "clave_vuelo",
+          "num_vuelo",
+          "iata_compania",
+          "aerolinea"
+        ],
+        "title": "CodigoVuelo"
+      },
+      "EventoVuelo": {
+        "properties": {
+          "detectado_en": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Detectado En"
+          },
+          "estado": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estado"
+          },
+          "estado_nombre": {
+            "type": "string",
+            "title": "Estado Nombre"
+          },
+          "puerta": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Puerta"
+          },
+          "salida_estimada": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salida Estimada"
+          },
+          "retraso_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retraso Min"
+          },
+          "mostrador": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mostrador"
+          },
+          "terminal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Terminal"
+          },
+          "tipo_aeronave": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tipo Aeronave"
+          },
+          "cambios": {
+            "items": {
+              "$ref": "#/components/schemas/Cambio"
+            },
+            "type": "array",
+            "title": "Cambios",
+            "description": "Campos que cambiaron respecto al evento anterior (vacío en el primero)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "detectado_en",
+          "estado",
+          "estado_nombre",
+          "puerta",
+          "salida_estimada",
+          "retraso_min",
+          "mostrador",
+          "terminal",
+          "tipo_aeronave",
+          "cambios"
+        ],
+        "title": "EventoVuelo"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HistogramaRetrasos": {
+        "properties": {
+          "intervalos": {
+            "items": {
+              "$ref": "#/components/schemas/IntervaloRetraso"
+            },
+            "type": "array",
+            "title": "Intervalos"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "mediana": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mediana"
+          },
+          "p90": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P90"
+          }
+        },
+        "type": "object",
+        "required": [
+          "intervalos",
+          "total",
+          "mediana",
+          "p90"
+        ],
+        "title": "HistogramaRetrasos"
+      },
+      "HistorialVuelo": {
+        "properties": {
+          "clave_vuelo": {
+            "type": "string",
+            "title": "Clave Vuelo"
+          },
+          "aeropuerto": {
+            "type": "string",
+            "title": "Aeropuerto"
+          },
+          "destino_iata": {
+            "type": "string",
+            "title": "Destino Iata"
+          },
+          "destino_ciudad": {
+            "type": "string",
+            "title": "Destino Ciudad"
+          },
+          "salida_programada": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Salida Programada"
+          },
+          "codigos": {
+            "items": {
+              "$ref": "#/components/schemas/CodigoVuelo"
+            },
+            "type": "array",
+            "title": "Codigos"
+          },
+          "eventos": {
+            "items": {
+              "$ref": "#/components/schemas/EventoVuelo"
+            },
+            "type": "array",
+            "title": "Eventos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "clave_vuelo",
+          "aeropuerto",
+          "destino_iata",
+          "destino_ciudad",
+          "salida_programada",
+          "codigos",
+          "eventos"
+        ],
+        "title": "HistorialVuelo"
+      },
+      "IntervaloRetraso": {
+        "properties": {
+          "inicio": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inicio",
+            "description": "Minuto inicial; null = adelantos mayores que el primer límite"
+          },
+          "fin": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fin",
+            "description": "Minuto final (excluido); null = sin límite superior"
+          },
+          "salidas": {
+            "type": "integer",
+            "title": "Salidas"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inicio",
+          "fin",
+          "salidas"
+        ],
+        "title": "IntervaloRetraso"
+      },
+      "Meta": {
+        "properties": {
+          "aeropuertos": {
+            "items": {
+              "$ref": "#/components/schemas/Aeropuerto"
+            },
+            "type": "array",
+            "title": "Aeropuertos"
+          },
+          "rango": {
+            "$ref": "#/components/schemas/RangoDias"
+          },
+          "umbral_puntual_min": {
+            "type": "integer",
+            "title": "Umbral Puntual Min"
+          }
+        },
+        "type": "object",
+        "required": [
+          "aeropuertos",
+          "rango",
+          "umbral_puntual_min"
+        ],
+        "title": "Meta"
+      },
+      "MetricasAeropuerto": {
+        "properties": {
+          "salidas": {
+            "type": "integer",
+            "title": "Salidas",
+            "description": "Salidas físicas (sin duplicar códigos compartidos)"
+          },
+          "vuelos": {
+            "type": "integer",
+            "title": "Vuelos",
+            "description": "Vuelos comerciales (cada número de vuelo cuenta)"
+          },
+          "cancelados": {
+            "type": "integer",
+            "title": "Cancelados",
+            "description": "Salidas físicas canceladas"
+          },
+          "tasa_cancelacion": {
+            "type": "number",
+            "title": "Tasa Cancelacion",
+            "description": "Fracción 0-1"
+          },
+          "retraso_medio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retraso Medio",
+            "description": "Minutos, según la hora estimada"
+          },
+          "tasa_puntualidad": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tasa Puntualidad",
+            "description": "Fracción 0-1 de salidas con retraso estimado ≤ umbral"
+          },
+          "aeropuerto": {
+            "type": "string",
+            "title": "Aeropuerto"
+          }
+        },
+        "type": "object",
+        "required": [
+          "salidas",
+          "vuelos",
+          "cancelados",
+          "tasa_cancelacion",
+          "retraso_medio",
+          "tasa_puntualidad",
+          "aeropuerto"
+        ],
+        "title": "MetricasAeropuerto"
+      },
+      "PanelDirecto": {
+        "properties": {
+          "aeropuerto": {
+            "type": "string",
+            "title": "Aeropuerto"
+          },
+          "actualizado": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actualizado",
+            "description": "Último cambio detectado en este aeropuerto"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Salidas en el panel a partir del margen, antes de aplicar el límite"
+          },
+          "vuelos": {
+            "items": {
+              "$ref": "#/components/schemas/VueloPanel"
+            },
+            "type": "array",
+            "title": "Vuelos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "aeropuerto",
+          "actualizado",
+          "total",
+          "vuelos"
+        ],
+        "title": "PanelDirecto"
+      },
+      "PuntoSerie": {
+        "properties": {
+          "salidas": {
+            "type": "integer",
+            "title": "Salidas",
+            "description": "Salidas físicas (sin duplicar códigos compartidos)"
+          },
+          "vuelos": {
+            "type": "integer",
+            "title": "Vuelos",
+            "description": "Vuelos comerciales (cada número de vuelo cuenta)"
+          },
+          "cancelados": {
+            "type": "integer",
+            "title": "Cancelados",
+            "description": "Salidas físicas canceladas"
+          },
+          "tasa_cancelacion": {
+            "type": "number",
+            "title": "Tasa Cancelacion",
+            "description": "Fracción 0-1"
+          },
+          "retraso_medio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retraso Medio",
+            "description": "Minutos, según la hora estimada"
+          },
+          "tasa_puntualidad": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tasa Puntualidad",
+            "description": "Fracción 0-1 de salidas con retraso estimado ≤ umbral"
+          },
+          "periodo": {
+            "type": "string",
+            "format": "date",
+            "title": "Periodo",
+            "description": "Primer día del periodo (día, lunes de la semana o día 1 del mes)"
+          },
+          "aeropuerto": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aeropuerto",
+            "description": "null cuando se agrupan todos los aeropuertos filtrados"
+          },
+          "dias": {
+            "type": "integer",
+            "title": "Dias",
+            "description": "Días con datos dentro del periodo"
+          },
+          "completo": {
+            "type": "boolean",
+            "title": "Completo",
+            "description": "False si el periodo no tiene todos sus días (p. ej. semana a medias)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "salidas",
+          "vuelos",
+          "cancelados",
+          "tasa_cancelacion",
+          "retraso_medio",
+          "tasa_puntualidad",
+          "periodo",
+          "aeropuerto",
+          "dias",
+          "completo"
+        ],
+        "title": "PuntoSerie"
+      },
+      "RangoDias": {
+        "properties": {
+          "dia_min": {
+            "type": "string",
+            "format": "date",
+            "title": "Dia Min",
+            "description": "Primer día con datos (incompleto)"
+          },
+          "dia_max": {
+            "type": "string",
+            "format": "date",
+            "title": "Dia Max",
+            "description": "Último día con datos (hoy, en curso)"
+          },
+          "dia_min_completo": {
+            "type": "string",
+            "format": "date",
+            "title": "Dia Min Completo"
+          },
+          "dia_max_completo": {
+            "type": "string",
+            "format": "date",
+            "title": "Dia Max Completo"
+          },
+          "ultima_deteccion": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ultima Deteccion",
+            "description": "Último cambio detectado por el pipeline"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dia_min",
+          "dia_max",
+          "dia_min_completo",
+          "dia_max_completo",
+          "ultima_deteccion"
+        ],
+        "title": "RangoDias"
+      },
+      "RankingAerolinea": {
+        "properties": {
+          "iata_compania": {
+            "type": "string",
+            "title": "Iata Compania"
+          },
+          "aerolinea": {
+            "type": "string",
+            "title": "Aerolinea"
+          },
+          "vuelos": {
+            "type": "integer",
+            "title": "Vuelos",
+            "description": "Vuelos comercializados, incluidos códigos compartidos"
+          },
+          "cancelados": {
+            "type": "integer",
+            "title": "Cancelados"
+          },
+          "retraso_medio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retraso Medio"
+          },
+          "tasa_puntualidad": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tasa Puntualidad"
+          }
+        },
+        "type": "object",
+        "required": [
+          "iata_compania",
+          "aerolinea",
+          "vuelos",
+          "cancelados",
+          "retraso_medio",
+          "tasa_puntualidad"
+        ],
+        "title": "RankingAerolinea"
+      },
+      "RankingDestino": {
+        "properties": {
+          "destino_iata": {
+            "type": "string",
+            "title": "Destino Iata"
+          },
+          "destino_ciudad": {
+            "type": "string",
+            "title": "Destino Ciudad"
+          },
+          "salidas": {
+            "type": "integer",
+            "title": "Salidas"
+          },
+          "retraso_medio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retraso Medio"
+          }
+        },
+        "type": "object",
+        "required": [
+          "destino_iata",
+          "destino_ciudad",
+          "salidas",
+          "retraso_medio"
+        ],
+        "title": "RankingDestino"
+      },
+      "Resumen": {
+        "properties": {
+          "salidas": {
+            "type": "integer",
+            "title": "Salidas",
+            "description": "Salidas físicas (sin duplicar códigos compartidos)"
+          },
+          "vuelos": {
+            "type": "integer",
+            "title": "Vuelos",
+            "description": "Vuelos comerciales (cada número de vuelo cuenta)"
+          },
+          "cancelados": {
+            "type": "integer",
+            "title": "Cancelados",
+            "description": "Salidas físicas canceladas"
+          },
+          "tasa_cancelacion": {
+            "type": "number",
+            "title": "Tasa Cancelacion",
+            "description": "Fracción 0-1"
+          },
+          "retraso_medio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retraso Medio",
+            "description": "Minutos, según la hora estimada"
+          },
+          "tasa_puntualidad": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tasa Puntualidad",
+            "description": "Fracción 0-1 de salidas con retraso estimado ≤ umbral"
+          },
+          "desde": {
+            "type": "string",
+            "format": "date",
+            "title": "Desde"
+          },
+          "hasta": {
+            "type": "string",
+            "format": "date",
+            "title": "Hasta"
+          },
+          "aeropuertos": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Aeropuertos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "salidas",
+          "vuelos",
+          "cancelados",
+          "tasa_cancelacion",
+          "retraso_medio",
+          "tasa_puntualidad",
+          "desde",
+          "hasta",
+          "aeropuertos"
+        ],
+        "title": "Resumen"
+      },
+      "Ruta": {
+        "properties": {
+          "origen": {
+            "type": "string",
+            "title": "Origen"
+          },
+          "destino_iata": {
+            "type": "string",
+            "title": "Destino Iata"
+          },
+          "destino_ciudad": {
+            "type": "string",
+            "title": "Destino Ciudad",
+            "description": "Nombre del destino tal como lo publica AENA"
+          },
+          "destino_nombre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destino Nombre",
+            "description": "Nombre del aeropuerto de destino (OurAirports)"
+          },
+          "pais": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pais",
+            "description": "Código ISO del país de destino"
+          },
+          "continente": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Continente"
+          },
+          "lat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lat",
+            "description": "null si el destino no tiene coordenadas conocidas"
+          },
+          "lon": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lon"
+          },
+          "salidas": {
+            "type": "integer",
+            "title": "Salidas"
+          },
+          "retraso_medio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retraso Medio"
+          },
+          "tasa_puntualidad": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tasa Puntualidad"
+          },
+          "tasa_cancelacion": {
+            "type": "number",
+            "title": "Tasa Cancelacion"
+          }
+        },
+        "type": "object",
+        "required": [
+          "origen",
+          "destino_iata",
+          "destino_ciudad",
+          "destino_nombre",
+          "pais",
+          "continente",
+          "lat",
+          "lon",
+          "salidas",
+          "retraso_medio",
+          "tasa_puntualidad",
+          "tasa_cancelacion"
+        ],
+        "title": "Ruta"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VueloPanel": {
+        "properties": {
+          "clave_vuelo": {
+            "type": "string",
+            "title": "Clave Vuelo",
+            "description": "Clave del primer código; sirve para pedir su historial"
+          },
+          "codigos": {
+            "items": {
+              "$ref": "#/components/schemas/CodigoVuelo"
+            },
+            "type": "array",
+            "title": "Codigos",
+            "description": "Todos los números de vuelo de esta salida (códigos compartidos)"
+          },
+          "destino_iata": {
+            "type": "string",
+            "title": "Destino Iata"
+          },
+          "destino_ciudad": {
+            "type": "string",
+            "title": "Destino Ciudad"
+          },
+          "salida_programada": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Salida Programada"
+          },
+          "salida_estimada": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salida Estimada"
+          },
+          "retraso_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retraso Min"
+          },
+          "estado": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estado"
+          },
+          "estado_nombre": {
+            "type": "string",
+            "title": "Estado Nombre"
+          },
+          "terminal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Terminal"
+          },
+          "puerta": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Puerta"
+          },
+          "mostrador": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mostrador"
+          },
+          "tipo_aeronave": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tipo Aeronave"
+          }
+        },
+        "type": "object",
+        "required": [
+          "clave_vuelo",
+          "codigos",
+          "destino_iata",
+          "destino_ciudad",
+          "salida_programada",
+          "salida_estimada",
+          "retraso_min",
+          "estado",
+          "estado_nombre",
+          "terminal",
+          "puerta",
+          "mostrador",
+          "tipo_aeronave"
+        ],
+        "title": "VueloPanel"
+      }
+    }
+  }
+}
