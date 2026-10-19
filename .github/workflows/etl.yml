@@ -2,17 +2,25 @@ name: ETL vuelos de salida
 
 on:
   repository_dispatch:
-    types: [scheduled-etl] 
+    types: [scheduled-etl]
   workflow_dispatch:
+  # Un push solo lanza el ETL si cambia el propio pipeline: los cambios en la web
+  # o en la documentación no deben provocar una ejecución extra que choque con la
+  # programada.
   push:
     branches:
       - main
-    paths-ignore:
-      - "data/**"
+    paths:
+      - "src/**"
+      - "main.py"
+      - "requirements.txt"
+      - ".github/workflows/etl.yml"
 
+# Las ejecuciones se ponen en cola en lugar de cancelarse: cancelar una a mitad
+# puede pillarla justo mientras sube datos.
 concurrency:
   group: etl-aena
-  cancel-in-progress: true 
+  cancel-in-progress: false
 
 jobs:
   run-etl:
@@ -24,6 +32,10 @@ jobs:
     steps:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
+        with:
+          # Siempre el último main (no el commit que disparó el evento): una ejecución
+          # que ha esperado en la cola debe partir del estado que dejó la anterior.
+          ref: main
 
       - name: Configurar Python
         uses: actions/setup-python@v5
@@ -41,26 +53,42 @@ jobs:
           set -e
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A data/
 
-          if git diff --staged --quiet; then
-            echo "Sin cambios en data/, no se hace commit."
-            exit 0
-          fi
+          # Crea el commit de datos; devuelve 1 si no hay nada que subir.
+          commit_datos() {
+            git add -A data/
+            if git diff --staged --quiet; then
+              echo "Sin cambios en data/, no se hace commit."
+              return 1
+            fi
+            git commit -m "Actualizar datos ETL $(TZ='Europe/Madrid' date +'%Y-%m-%d %H:%M %Z')"
+          }
 
-          git commit -m "Actualizar datos ETL $(TZ='Europe/Madrid' date +'%Y-%m-%d %H:%M %Z')"
+          commit_datos || exit 0
 
           max_attempts=5
           attempt=1
           until [ $attempt -gt $max_attempts ]
           do
             echo "Intento de push #$attempt..."
-            if git pull --rebase && git push; then
+
+            if ! git pull --rebase; then
+              # Otra ejecución ya subió datos de los mismos archivos binarios (.parquet,
+              # .pkl), que Git no sabe fusionar. Se descarta este commit y se rehace el
+              # ETL sobre el último estado de GitHub, así no se pierde ninguna detección.
+              echo "Conflicto con datos más recientes en GitHub: se rehace el ETL sobre el último estado."
+              git rebase --abort || true
+              git fetch origin main
+              git reset --hard origin/main
+              python main.py
+              commit_datos || exit 0
+            elif git push; then
               echo "Push realizado con éxito."
               exit 0
+            else
+              echo "Fallo en el push (posible error transitorio de GitHub). Reintentando..."
             fi
 
-            echo "Fallo en el push (posible error transitorio de GitHub). Reintentando..."
             attempt=$((attempt+1))
             sleep $((attempt * 5))
           done
