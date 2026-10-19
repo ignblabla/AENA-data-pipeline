@@ -1,22 +1,35 @@
 import { Badge, Text } from '@mantine/core'
+import { Clock } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { COLORES_ALERTA, estiloEstado, nivelRetraso } from '../../tema/estados'
+import { estiloEstado, nivelRetraso } from '../../tema/estados'
+import { TINTAS } from '../../tema/tokens'
 import { textos } from '../../textos'
 
-/** Estado del vuelo: icono + texto; al cambiar de estado, la insignia "salta" para llamar la atención. */
+// Insignias pensadas para leerse sobre el panel negro (panel en directo e historial).
+
+/** Estado del vuelo: icono + texto; al cambiar de estado, la insignia cae como una paleta. */
 export function InsigniaEstado({ codigo, nombre }: { codigo: string | null | undefined; nombre: string }) {
-  const e = estiloEstado(codigo)
+  const { variante, color, Icono } = estiloEstado(codigo)
   return (
     <AnimatePresence mode="popLayout" initial={false}>
       <motion.span
         key={nombre}
-        initial={{ scale: 0.6, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.6, opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-        style={{ display: 'inline-block' }}
+        initial={{ rotateX: -80, opacity: 0 }}
+        animate={{ rotateX: 0, opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+        style={{ display: 'inline-block', transformPerspective: 300 }}
       >
-        <Badge color={e.color} variant={e.variante} autoContrast radius="sm" tt="none" leftSection={<span aria-hidden>{e.icono}</span>}>
+        <Badge
+          color={color}
+          variant={variante}
+          autoContrast
+          radius="xs"
+          tt="none"
+          size="md"
+          leftSection={<Icono size={13} strokeWidth={2.4} aria-hidden />}
+          styles={{ label: { fontWeight: 600 } }}
+        >
           {nombre}
         </Badge>
       </motion.span>
@@ -24,26 +37,31 @@ export function InsigniaEstado({ codigo, nombre }: { codigo: string | null | und
   )
 }
 
-/** Retraso estimado: texto discreto si es pequeño, insignia de alerta a partir del umbral. */
+/** Retraso estimado: discreto si es pequeño; en ámbar a partir del umbral (contorno si es moderado, lleno si pasa de una hora). */
 export function InsigniaRetraso({ minutos, cancelado }: { minutos: number | null | undefined; cancelado?: boolean }) {
   if (cancelado || minutos == null) return null
   const nivel = nivelRetraso(minutos)
-  if (nivel === 'ninguno') {
+  if (nivel === 'ninguno' || nivel === 'leve') {
     return (
-      <Text span size="xs" c="dimmed">
-        {minutos < 0 ? textos.directo.adelanto(-minutos) : textos.directo.enHora}
-      </Text>
-    )
-  }
-  if (nivel === 'leve') {
-    return (
-      <Text span size="xs" c="dimmed">
-        {textos.directo.retraso(minutos)}
+      <Text span size="xs" c="#a19d94">
+        {nivel === 'ninguno'
+          ? minutos < 0
+            ? textos.directo.adelanto(-minutos)
+            : textos.directo.enHora
+          : textos.directo.retraso(minutos)}
       </Text>
     )
   }
   return (
-    <Badge color={nivel === 'aviso' ? COLORES_ALERTA.aviso : COLORES_ALERTA.serio} autoContrast radius="sm" size="sm" tt="none" leftSection={<span aria-hidden>▲</span>}>
+    <Badge
+      color={TINTAS.ambar}
+      variant={nivel === 'serio' ? 'filled' : 'outline'}
+      autoContrast
+      radius="xs"
+      size="sm"
+      tt="none"
+      leftSection={<Clock size={12} strokeWidth={2.4} aria-hidden />}
+    >
       {textos.directo.retraso(minutos)}
     </Badge>
   )

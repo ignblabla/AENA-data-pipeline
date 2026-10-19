@@ -1,6 +1,15 @@
-// Tokens de color de los gráficos, en claro y oscuro. Todos los gráficos
-// leen de aquí: cambiar la marca visual es cambiar este archivo.
-// Valores validados (contraste y daltonismo) de la paleta de referencia.
+// Tokens del mundo visual "panel de paletas": cuatro tintas sobre acero.
+//   negro de paleta · blanco de pintura · ámbar de lámpara (solo retraso / lo que cambia) · rojo (solo cancelado)
+// De día el suelo es acero cepillado claro; de noche, el vestíbulo oscuro. El panel es siempre negro.
+// Todos los gráficos y mapas leen de aquí: cambiar el mundo es cambiar este archivo.
+
+export const TINTAS = {
+  paleta: '#141414', // cara negra mate de la paleta
+  pintura: '#f2efe6', // letra pintada
+  ambar: '#f2a900', // lámpara de retraso; también la acción principal
+  rojo: '#c8372d', // cancelado
+  acero: '#8e9296', // marco del panel
+}
 
 export interface TokensGrafico {
   superficie: string
@@ -9,15 +18,16 @@ export interface TokensGrafico {
   textoTenue: string
   rejilla: string
   eje: string
-  serie: string // color principal de datos (secuencial azul)
-  serieSuave: string // relleno de área (~10 %)
-  serieAtenuada: string // barras de contexto / no seleccionadas
-  destacado: string // el paso de la rampa con más contraste sobre el fondo (estelas, origen de rutas)
+  /** Tinta de los datos: negro sobre acero de día, pintura sobre negro de noche */
+  serie: string
+  serieSuave: string
+  serieAtenuada: string
+  /** El paso con más contraste (estelas del mapa de rutas, orígenes) */
+  destacado: string
   tooltipFondo: string
   tooltipBorde: string
-  /** Rampa secuencial azul (de "poco" a "mucho") para mapas de calor y mapas */
+  /** Rampa secuencial de una sola tinta, de "poco" (cerca del fondo) a "mucho" */
   rampa: string[]
-  /** Texto de variaciones favorables / desfavorables (siempre con icono, nunca solo color) */
   textoBueno: string
   textoMalo: string
   /** Estilo vectorial del mapa base (CARTO, gratuito con atribución) */
@@ -26,40 +36,40 @@ export interface TokensGrafico {
 
 export const TOKENS: Record<'light' | 'dark', TokensGrafico> = {
   light: {
-    superficie: '#fcfcfb',
-    textoPrincipal: '#0b0b0b',
-    textoSecundario: '#52514e',
-    textoTenue: '#898781',
-    rejilla: '#e1e0d9',
-    eje: '#c3c2b7',
-    serie: '#2a78d6',
-    serieSuave: 'rgba(42, 120, 214, 0.10)',
-    serieAtenuada: '#b7d3f6',
-    destacado: '#0d366b',
-    tooltipFondo: '#fcfcfb',
-    tooltipBorde: 'rgba(11, 11, 11, 0.10)',
-    rampa: ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95', '#0d366b'],
-    textoBueno: '#006300',
-    textoMalo: '#d03b3b',
+    superficie: '#eef0f1',
+    textoPrincipal: '#141414',
+    textoSecundario: '#41464b',
+    textoTenue: '#656b71',
+    rejilla: '#d3d7da',
+    eje: '#a9aeb2',
+    serie: '#141414',
+    serieSuave: 'rgba(20, 20, 20, 0.07)',
+    serieAtenuada: '#b3b8bc',
+    destacado: '#141414',
+    tooltipFondo: '#f7f8f8',
+    tooltipBorde: 'rgba(20, 20, 20, 0.16)',
+    rampa: ['#d3d7da', '#aeb3b8', '#868c92', '#5f656b', '#3c4146', '#262a2e', '#141414'],
+    // La paleta es cerrada: lo favorable va en tinta (la flecha y el texto lo explican); lo desfavorable, en rojo
+    textoBueno: '#141414',
+    textoMalo: '#b5302a',
     estiloMapa: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
   },
   dark: {
-    superficie: '#1a1a19',
-    textoPrincipal: '#f0efec',
-    textoSecundario: '#c3c2b7',
-    textoTenue: '#898781',
-    rejilla: '#2c2c2a',
-    eje: '#383835',
-    serie: '#3987e5',
-    serieSuave: 'rgba(57, 135, 229, 0.12)',
-    serieAtenuada: '#184f95',
-    destacado: '#cde2fb',
-    tooltipFondo: '#1a1a19',
-    tooltipBorde: 'rgba(255, 255, 255, 0.10)',
-    // En oscuro, "poco" es el paso más cercano al fondo y "mucho" el más luminoso
-    rampa: ['#184f95', '#1c5cab', '#256abf', '#2a78d6', '#3987e5', '#6da7ec', '#9ec5f4'],
-    textoBueno: '#0ca30c',
-    textoMalo: '#e66767',
+    superficie: '#17191b',
+    textoPrincipal: '#f2efe6',
+    textoSecundario: '#c4c0b6',
+    textoTenue: '#8f8b83',
+    rejilla: '#26292c',
+    eje: '#3a3e42',
+    serie: '#f2efe6',
+    serieSuave: 'rgba(242, 239, 230, 0.08)',
+    serieAtenuada: '#4a4e52',
+    destacado: '#f2efe6',
+    tooltipFondo: '#0b0c0d',
+    tooltipBorde: 'rgba(242, 239, 230, 0.16)',
+    rampa: ['#2b2e31', '#44484c', '#62666a', '#85888b', '#aaaaa6', '#cfccc3', '#f2efe6'],
+    textoBueno: '#f2efe6',
+    textoMalo: '#e0564c',
     estiloMapa: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
   },
 }

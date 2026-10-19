@@ -76,7 +76,7 @@ export function Directo() {
     <Stack gap="lg">
       <Group justify="space-between" align="flex-end" wrap="wrap" gap="md">
         <div>
-          <Title order={2} fz={28}>
+          <Title order={1} className="titulo-pagina">
             {textos.directo.titulo} · {codigo}
           </Title>
           {aeropuerto && <Text c="dimmed">{aeropuerto.nombre}</Text>}

@@ -9,6 +9,7 @@ type Esquemas = components['schemas']
 
 export type Aeropuerto = Esquemas['Aeropuerto']
 export type Meta = Esquemas['Meta']
+export type Proyecto = Esquemas['Proyecto']
 export type Resumen = Esquemas['Resumen']
 export type PuntoSerie = Esquemas['PuntoSerie']
 export type MetricasAeropuerto = Esquemas['MetricasAeropuerto']

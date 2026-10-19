@@ -8,7 +8,48 @@ export const textos = {
     cambiarTema: 'Cambiar entre modo claro y oscuro',
     cargando: 'Cargando…',
   },
+  portada: {
+    titular: 'Cada salida de los 11 grandes aeropuertos de España, registrada cambio a cambio',
+    entradilla:
+      'Un pipeline propio consulta los paneles de salidas cada 10 minutos y guarda solo lo que cambia: estado, puerta, hora estimada, mostradores, terminal y avión. Esta web convierte ese histórico en análisis.',
+    accion: 'Explorar los datos',
+    elegirAeropuerto: 'Elegir el aeropuerto del panel',
+    etiquetaPanel: (aeropuerto: string) => `Próximas salidas de ${aeropuerto}`,
+    relojPanel: (iata: string) => `Última extracción ${iata}`,
+    pieTablero: (iata: string, cuando: string) =>
+      `Última extracción del pipeline en ${iata}: ${cuando}. No es tiempo real: se actualiza cada 10 minutos.`,
+    altFoto: 'Silueta de un Airbus A320 con el tren de aterrizaje desplegado, en aproximación al aeropuerto de Palma de Mallorca, a contraluz entre nubes',
+    fotoDe: 'Foto:',
+    registro: 'Registro del pipeline',
+    cifras: {
+      eventos: 'Cambios registrados',
+      vuelos: 'Vuelos seguidos',
+      destinos: 'Destinos',
+      paises: 'Países',
+    },
+    recorrido: 'Cada 10 minutos',
+    recorridoSub: 'El recorrido de un dato, desde el panel del aeropuerto hasta esta página.',
+    columnasRecorrido: { paso: 'Paso', cifra: 'Cifra', que: 'Qué ocurre' },
+    pasos: [
+      { nombre: 'Extraer', unidad: 'aeropuertos consultados', texto: 'Una consulta por aeropuerto al panel de salidas que publica AENA.' },
+      { nombre: 'Comparar', unidad: 'cambios en la última pasada', texto: 'Solo pasan los vuelos nuevos o con algún cambio respecto a la extracción anterior.' },
+      { nombre: 'Guardar', unidad: 'archivos Parquet', texto: 'Un archivo por aeropuerto y día, versionado en Git junto al código.' },
+      { nombre: 'Servir', unidad: 'salidas analizadas', texto: 'Una API en FastAPI y DuckDB calcula las métricas al vuelo sobre todo el histórico.' },
+      { nombre: 'Mostrar', unidad: 'rutas en el mapa', texto: 'Esta web: React, ECharts, MapLibre y deck.gl, con los tipos generados desde la API.' },
+    ],
+    embarque: 'Embarque',
+    puertas: {
+      panorama: { nombre: 'Panorama', texto: 'Los 11 aeropuertos de un vistazo: salidas, retrasos, puntualidad y cancelaciones.' },
+      aeropuertos: { nombre: 'Aeropuertos', texto: 'Cada aeropuerto a fondo: horas punta, distribución de retrasos y aerolíneas.' },
+      rutas: { nombre: 'Rutas', texto: 'Todas las rutas sobre el mapa del mundo, con sus destinos y países.' },
+      directo: { nombre: 'En directo', texto: 'El panel de salidas de la última extracción y el historial de cada vuelo.' },
+    },
+    independiente: 'Proyecto independiente. Los datos proceden de los paneles públicos de salidas de AENA; no es una web oficial de AENA.',
+    creditos: 'Mapas: © CARTO, © colaboradores de OpenStreetMap. Coordenadas de destinos: OurAirports (dominio público).',
+    codigo: 'Código del proyecto en GitHub',
+  },
   navegacion: {
+    inicio: 'Inicio',
     panorama: 'Panorama',
     aeropuertos: 'Aeropuertos',
     rutas: 'Rutas',
@@ -86,6 +127,10 @@ export const textos = {
     leyendaMenos: 'menos',
     leyendaMas: 'más',
   },
+  panorama: {
+    titulo: 'Panorama',
+    subtitulo: 'Los 11 aeropuertos de un vistazo: salidas, retrasos, puntualidad y cancelaciones.',
+  },
   aeropuerto: {
     volver: 'Volver al panorama',
     desconocido: 'Ese aeropuerto no está entre los 11 monitorizados.',
@@ -132,6 +177,7 @@ export const textos = {
     enHora: 'En hora',
     adelanto: (min: number) => `${min} min antes`,
     // A partir de 2 h, en horas: "+24 h", "+19 h 11 min"
+    cambios: (n: number) => `${n} ${n === 1 ? 'cambio' : 'cambios'}`,
     retraso: (min: number) => (min < 120 ? `+${min} min` : `+${Math.floor(min / 60)} h${min % 60 ? ` ${min % 60} min` : ''}`),
   },
   historial: {

@@ -10,6 +10,7 @@ import type {
   Meta,
   MetricasAeropuerto,
   PanelDirecto,
+  Proyecto,
   PuntoSerie,
   RankingAerolinea,
   RankingDestino,
@@ -29,6 +30,14 @@ export function useMeta() {
   return useQuery({
     queryKey: ['meta'],
     queryFn: ({ signal }) => obtener<Meta>('/meta', {}, signal),
+    staleTime: 5 * 60_000,
+  })
+}
+
+export function useProyecto() {
+  return useQuery({
+    queryKey: ['proyecto'],
+    queryFn: ({ signal }) => obtener<Proyecto>('/proyecto', {}, signal),
     staleTime: 5 * 60_000,
   })
 }

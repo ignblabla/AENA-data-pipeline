@@ -1,4 +1,6 @@
 import { Card, Group, Skeleton, Text } from '@mantine/core'
+import { ArrowDown, ArrowUp, Equal } from 'lucide-react'
+import { FUENTE_PALETA } from '../tema/mantine'
 import { useTokens } from './graficos/opciones'
 
 export interface Variacion {
@@ -16,11 +18,12 @@ interface Props {
   variacion?: Variacion
 }
 
-const FLECHAS = { sube: '▲', baja: '▼', igual: '●' }
+const FLECHAS = { sube: ArrowUp, baja: ArrowDown, igual: Equal }
 
 /** Tarjeta de indicador: etiqueta, valor grande, variación opcional y una nota de contexto. */
 export function KpiTarjeta({ etiqueta, valor, nota, variacion }: Props) {
   const t = useTokens()
+  const Flecha = variacion ? FLECHAS[variacion.sentido] : null
   const color = variacion?.tono === 'bueno' ? t.textoBueno : variacion?.tono === 'malo' ? t.textoMalo : 'var(--mantine-color-dimmed)'
 
   return (
@@ -31,15 +34,13 @@ export function KpiTarjeta({ etiqueta, valor, nota, variacion }: Props) {
       {valor === undefined ? (
         <Skeleton h={36} w="60%" my={4} />
       ) : (
-        <Text fz={32} fw={650} lh={1.25} style={{ letterSpacing: '-0.01em' }}>
+        <Text fz={40} fw={700} lh={1.1} ff={FUENTE_PALETA} style={{ letterSpacing: '0.01em' }}>
           {valor}
         </Text>
       )}
       {variacion && (
         <Group gap={4} wrap="nowrap" mt={2}>
-          <Text span size="xs" c={color} aria-hidden>
-            {FLECHAS[variacion.sentido]}
-          </Text>
+          {Flecha && <Flecha size={14} strokeWidth={2.5} color={color} aria-hidden />}
           <Text span size="xs" fw={600} c={color}>
             {variacion.texto}
           </Text>

@@ -1,5 +1,6 @@
 import { Alert, Anchor, Button, Grid, Group, Select, SimpleGrid, Stack, Text, Title } from '@mantine/core'
 import { useMemo } from 'react'
+import { ArrowLeft } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { useHorario, useMeta, useRankingAerolineas, useRankingDestinos, useResumen, useRetrasos, useSerie } from '../api/consultas'
 import { BarraFiltros } from '../componentes/BarraFiltros'
@@ -79,8 +80,8 @@ export function Aeropuerto() {
         <Alert color="gray" variant="light">
           {textos.aeropuerto.desconocido}
         </Alert>
-        <Anchor component={Link} to={`/${busqueda}`}>
-          ← {textos.aeropuerto.volver}
+        <Anchor component={Link} to={`/panorama${busqueda}`}>
+          {textos.aeropuerto.volver}
         </Anchor>
       </Stack>
     )
@@ -100,15 +101,16 @@ export function Aeropuerto() {
     <Stack gap="lg">
       <Group justify="space-between" align="flex-end" wrap="wrap" gap="md">
         <div>
-          <Anchor component={Link} to={`/${busqueda}`} size="sm">
-            ← {textos.aeropuerto.volver}
+          <Anchor component={Link} to={`/panorama${busqueda}`} size="sm" c="dimmed" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <ArrowLeft size={15} aria-hidden />
+            {textos.aeropuerto.volver}
           </Anchor>
-          <Title order={2} fz={28} mt={4}>
+          <Title order={1} className="titulo-pagina" mt={6}>
             {aeropuerto ? `${aeropuerto.iata} · ${aeropuerto.nombre}` : codigo}
           </Title>
           {aeropuerto && <Text c="dimmed">{aeropuerto.ciudad}</Text>}
           <Group gap="xs" mt="sm">
-            <Button component={Link} to={`/directo/${codigo}${busqueda}`} variant="light" size="xs">
+            <Button component={Link} to={`/directo/${codigo}${busqueda}`} variant="filled" size="xs">
               {textos.aeropuerto.verDirecto}
             </Button>
             <Button component={Link} to={enlaceRutas} variant="default" size="xs">

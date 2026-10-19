@@ -55,8 +55,11 @@ def panel(iata: str, limite: Annotated[int, Query(ge=1, le=500)] = 80):
         SELECT a.*,
                coalesce(e.nombre, 'Sin estado') AS estado_nombre,
                date_diff('minute', a.salida_programada, a.salida_estimada) AS retraso_min,
+               coalesce(v.n_eventos, 0) AS n_cambios,
                count(*) OVER () AS total
-        FROM agrupado a LEFT JOIN estados e ON e.codigo = a.estado
+        FROM agrupado a
+        LEFT JOIN estados e ON e.codigo = a.estado
+        LEFT JOIN vuelos v ON v.clave_vuelo = a.clave_vuelo
         ORDER BY a.salida_programada, a.destino_iata
         LIMIT ?
         """,

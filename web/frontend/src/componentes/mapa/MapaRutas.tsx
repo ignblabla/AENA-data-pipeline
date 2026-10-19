@@ -2,6 +2,7 @@ import { MapboxOverlay } from '@deck.gl/mapbox'
 import { PathLayer, ScatterplotLayer } from '@deck.gl/layers'
 import { ActionIcon, Alert, Box, Group, Stack, Text, Tooltip } from '@mantine/core'
 import { useReducedMotion } from '@mantine/hooks'
+import { Pause, Play } from 'lucide-react'
 import { LngLatBounds, Map as MapaLibre, NavigationControl } from 'maplibre-gl'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { escapar } from '../../tema/formato'
@@ -262,7 +263,7 @@ export function MapaRutas({ rutas, destinos, origenes, colorPorValor, formatear,
               onClick={() => setPausado((p) => !p)}
               aria-label={pausado ? textos.rutas.reanudar : textos.rutas.pausar}
             >
-              {pausado ? <IconoPlay /> : <IconoPausa />}
+              {pausado ? <Play size={14} aria-hidden /> : <Pause size={14} aria-hidden />}
             </ActionIcon>
           </Tooltip>
         )}
@@ -302,21 +303,4 @@ function tooltip(objeto: unknown, t: TokensGrafico) {
       boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
     },
   }
-}
-
-function IconoPausa() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <rect x="6" y="4" width="4" height="16" rx="1" />
-      <rect x="14" y="4" width="4" height="16" rx="1" />
-    </svg>
-  )
-}
-
-function IconoPlay() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" />
-    </svg>
-  )
 }

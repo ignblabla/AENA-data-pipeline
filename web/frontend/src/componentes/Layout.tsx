@@ -1,5 +1,6 @@
-import { ActionIcon, AppShell, Burger, Container, Group, Menu, Text, Title, useComputedColorScheme, useMantineColorScheme } from '@mantine/core'
+import { ActionIcon, AppShell, Burger, Container, Group, Menu, Text, useComputedColorScheme, useMantineColorScheme } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
+import { Moon, Sun } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Link, Outlet, useLocation } from 'react-router'
 import { useMeta } from '../api/consultas'
@@ -9,7 +10,7 @@ import { textos } from '../textos'
 
 // Cada página: a dónde enlaza y qué rutas la marcan como activa
 const PAGINAS = [
-  { ruta: '/', etiqueta: textos.navegacion.panorama, activa: (ruta: string) => ruta === '/' },
+  { ruta: '/panorama', etiqueta: textos.navegacion.panorama, activa: (ruta: string) => ruta.startsWith('/panorama') },
   { ruta: '/aeropuerto/MAD', etiqueta: textos.navegacion.aeropuertos, activa: (ruta: string) => ruta.startsWith('/aeropuerto/') },
   { ruta: '/rutas', etiqueta: textos.navegacion.rutas, activa: (ruta: string) => ruta.startsWith('/rutas') },
   { ruta: '/directo/MAD', etiqueta: textos.navegacion.directo, activa: (ruta: string) => ruta.startsWith('/directo/') },
@@ -26,32 +27,31 @@ export function Layout() {
 
   return (
     <AppShell header={{ height: 64 }} padding={0}>
-      <AppShell.Header>
+      {/* Cabecera: una tira de acero, como el marco de los paneles */}
+      <AppShell.Header style={{ backgroundColor: 'var(--acero-tira)' }}>
         <Container size="xl" h="100%">
           <Group h="100%" justify="space-between" wrap="nowrap">
             <Group gap="lg" wrap="nowrap">
               {/* En móvil, las páginas van en un menú desplegable */}
               <Menu opened={menuAbierto} onChange={menu.toggle} position="bottom-start" width={220}>
                 <Menu.Target>
-                  <Burger opened={menuAbierto} hiddenFrom="sm" size="sm" aria-label={textos.navegacion.menu} />
+                  <Burger opened={menuAbierto} hiddenFrom="md" size="sm" aria-label={textos.navegacion.menu} />
                 </Menu.Target>
                 <Menu.Dropdown>
+                  <Menu.Item component={Link} to="/" fw={pathname === '/' ? 700 : 400}>
+                    {textos.navegacion.inicio}
+                  </Menu.Item>
                   {PAGINAS.map((p) => (
-                    <Menu.Item key={p.ruta} component={Link} to={`${p.ruta}${busqueda}`} fw={p.activa(pathname) ? 650 : 400}>
+                    <Menu.Item key={p.ruta} component={Link} to={`${p.ruta}${busqueda}`} fw={p.activa(pathname) ? 700 : 400}>
                       {p.etiqueta}
                     </Menu.Item>
                   ))}
                 </Menu.Dropdown>
               </Menu>
-              <div>
-                <Title order={1} fz="lg" lh={1.2}>
-                  {textos.app.titulo}
-                </Title>
-                <Text size="xs" c="dimmed" visibleFrom="xs">
-                  {textos.app.subtitulo}
-                </Text>
-              </div>
-              <Group gap={4} visibleFrom="sm" wrap="nowrap">
+              <Link to="/" className="marca" aria-label={`${textos.app.titulo}: ${textos.navegacion.inicio}`}>
+                {textos.app.titulo}
+              </Link>
+              <Group gap={2} visibleFrom="md" wrap="nowrap" component="nav" aria-label={textos.navegacion.menu}>
                 {PAGINAS.map((p) => (
                   <Link
                     key={p.ruta}
@@ -66,48 +66,37 @@ export function Layout() {
             </Group>
             <Group gap="sm" wrap="nowrap">
               {meta && (
-                <Text size="xs" c="dimmed" ta="right" visibleFrom="md">
+                <Text size="xs" c="dimmed" ta="right" visibleFrom="lg">
                   {textos.app.datosHasta} {formato.fechaHora(meta.rango.ultima_deteccion)}
                 </Text>
               )}
               <ActionIcon
-                variant="default"
+                variant="subtle"
+                color="dark"
                 size="lg"
                 onClick={() => setColorScheme(esquema === 'dark' ? 'light' : 'dark')}
                 aria-label={textos.app.cambiarTema}
                 title={textos.app.cambiarTema}
               >
-                {esquema === 'dark' ? <IconoSol /> : <IconoLuna />}
+                {esquema === 'dark' ? <Sun size={18} aria-hidden /> : <Moon size={18} aria-hidden />}
               </ActionIcon>
             </Group>
           </Group>
         </Container>
       </AppShell.Header>
       <AppShell.Main>
-        <Container size="xl" py="lg">
+        <Container size="xl" py="xl">
           {/* Transición suave al cambiar de página (se desactiva si el sistema pide reducir el movimiento) */}
-          <motion.div key={pathname} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, ease: 'easeOut' }}>
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          >
             <Outlet />
           </motion.div>
         </Container>
       </AppShell.Main>
     </AppShell>
-  )
-}
-
-function IconoSol() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
-    </svg>
-  )
-}
-
-function IconoLuna() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
-    </svg>
   )
 }

@@ -33,6 +33,20 @@ class Meta(BaseModel):
     umbral_puntual_min: int
 
 
+class Proyecto(BaseModel):
+    eventos: int = Field(description="Cambios registrados por el pipeline en todo el histórico")
+    vuelos: int = Field(description="Vuelos comerciales distintos (cada código compartido cuenta)")
+    salidas: int = Field(description="Salidas físicas distintas")
+    destinos: int
+    paises: int
+    aeropuertos: int
+    rutas: int = Field(description="Pares aeropuerto de origen → destino distintos")
+    particiones: int = Field(description="Archivos del histórico (un Parquet por aeropuerto y día)")
+    cambios_ultima_pasada: int = Field(description="Cambios detectados en la última ejecución del pipeline")
+    primera_deteccion: datetime
+    ultima_deteccion: datetime
+
+
 class Metricas(BaseModel):
     salidas: int = Field(description="Salidas físicas (sin duplicar códigos compartidos)")
     vuelos: int = Field(description="Vuelos comerciales (cada número de vuelo cuenta)")
@@ -130,6 +144,7 @@ class VueloPanel(BaseModel):
     puerta: str | None
     mostrador: str | None
     tipo_aeronave: str | None
+    n_cambios: int = Field(description="Cambios registrados en el histórico para el primer código de esta salida")
 
 
 class PanelDirecto(BaseModel):

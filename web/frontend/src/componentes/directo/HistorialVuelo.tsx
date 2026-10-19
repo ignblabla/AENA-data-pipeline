@@ -79,20 +79,23 @@ export function HistorialVuelo({ clave }: { clave: string }) {
 
   return (
     <Stack gap="lg">
-      <div>
-        <Title order={3} fz="xl">
-          {data.codigos.map(codigoVuelo).join(' · ')}
-        </Title>
-        <Text c="dimmed">
-          {data.aeropuerto} → {data.destino_iata} · {formato.nombrePropio(data.destino_ciudad)}
-        </Text>
-        <Text size="sm" c="dimmed">
-          {textos.historial.programado(formato.fechaHora(data.salida_programada))}
-        </Text>
-        <Group gap="xs" mt="xs">
-          <InsigniaEstado codigo={ultimo.estado} nombre={ultimo.estado_nombre} />
-          <InsigniaRetraso minutos={ultimo.retraso_min} cancelado={ultimo.estado === 'CAN'} />
-        </Group>
+      {/* La cabecera es la fila del vuelo en el panel: negra, con su estado actual */}
+      <div className="marco-panel">
+        <div className="panel-negro" style={{ padding: '16px 18px' }}>
+          <Title order={3} c="var(--tinta-pintura)" style={{ fontSize: '1.75rem', letterSpacing: '0.02em' }}>
+            {data.codigos.map(codigoVuelo).join(' · ')}
+          </Title>
+          <Text c="#c4c0b6">
+            {data.aeropuerto} → {data.destino_iata} · {formato.nombrePropio(data.destino_ciudad)}
+          </Text>
+          <Text size="sm" c="#a19d94">
+            {textos.historial.programado(formato.fechaHora(data.salida_programada))}
+          </Text>
+          <Group gap="xs" mt="sm">
+            <InsigniaEstado codigo={ultimo.estado} nombre={ultimo.estado_nombre} />
+            <InsigniaRetraso minutos={ultimo.retraso_min} cancelado={ultimo.estado === 'CAN'} />
+          </Group>
+        </div>
       </div>
 
       {meta && (
@@ -115,7 +118,7 @@ export function HistorialVuelo({ clave }: { clave: string }) {
           {data.eventos.map((evento, i) => (
             <Timeline.Item
               key={evento.detectado_en}
-              color={estiloEstado(evento.estado).color}
+              color={estiloEstado(evento.estado).linea}
               title={
                 <Text size="xs" c="dimmed" fw={500}>
                   {formato.fechaHora(evento.detectado_en)}

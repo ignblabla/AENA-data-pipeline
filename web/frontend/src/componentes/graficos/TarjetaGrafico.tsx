@@ -86,7 +86,7 @@ export function TarjetaGrafico<T>({ titulo, subtitulo, datos, error, actualizand
         <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm">
           <Box miw={0} style={{ flex: 1 }}>
             <Group gap="xs">
-              <Title order={3} fz="md">
+              <Title order={3} tt="uppercase" style={{ letterSpacing: '0.03em' }}>
                 {titulo}
               </Title>
               {actualizando && <Loader size={12} />}

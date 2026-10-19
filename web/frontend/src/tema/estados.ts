@@ -1,42 +1,47 @@
-// Presentación de los estados de un vuelo y de su retraso.
-// Los colores de alerta (paleta de estado fija) se reservan para lo excepcional
-// (retrasos y cancelaciones) y siempre van con icono y texto, nunca solo color.
+import { BellRing, Check, Clock, DoorOpen, Luggage, TriangleAlert, X, type LucideIcon } from 'lucide-react'
+import { TINTAS } from './tokens'
 
-export const COLORES_ALERTA = {
-  aviso: '#fab219',
-  serio: '#ec835a',
-  critico: '#d03b3b',
-}
+// Presentación de los estados de un vuelo y de su retraso, en las cuatro tintas del panel.
+// Las insignias se leen sobre el panel negro (en claro y en oscuro). El ámbar es solo para
+// el retraso y el rojo solo para la cancelación; todo lleva icono y texto, nunca solo color.
 
 export interface EstiloEstado {
-  /** Color de Mantine o hexadecimal */
+  variante: 'filled' | 'outline'
   color: string
-  variante: 'filled' | 'light' | 'outline'
-  icono: string
+  Icono: LucideIcon
+  /** Color para elementos sobre el fondo de la página (p. ej. la línea temporal) */
+  linea: string
 }
 
-const EN_CURSO: EstiloEstado = { color: 'azul', variante: 'light', icono: '›' }
-const TERMINADO: EstiloEstado = { color: 'gray', variante: 'filled', icono: '✓' }
+const NEUTRO_TENUE = '#8f8b83'
+const ACERO_OSCURO = '#3a3e42'
+const TINTA_TEXTO = 'var(--mantine-color-text)'
+
+const EMBARQUE: EstiloEstado = { variante: 'filled', color: TINTAS.pintura, Icono: DoorOpen, linea: TINTA_TEXTO }
+const ULTIMA: EstiloEstado = { variante: 'filled', color: TINTAS.pintura, Icono: BellRing, linea: TINTA_TEXTO }
+const TERMINADO: EstiloEstado = { variante: 'filled', color: ACERO_OSCURO, Icono: Check, linea: 'var(--mantine-color-dimmed)' }
 
 const ESTILOS: Record<string, EstiloEstado> = {
-  SCH: { color: 'gray', variante: 'outline', icono: '·' },
-  INI: { color: 'gray', variante: 'light', icono: '›' },
-  BOR: EN_CURSO,
-  EMB: EN_CURSO,
-  BRD: EN_CURSO,
-  ULL: { color: 'azul', variante: 'filled', icono: '»' },
-  LSC: { color: 'azul', variante: 'filled', icono: '»' },
+  SCH: { variante: 'outline', color: NEUTRO_TENUE, Icono: Clock, linea: 'var(--mantine-color-dimmed)' },
+  INI: { variante: 'outline', color: '#c4c0b6', Icono: Luggage, linea: 'var(--mantine-color-dimmed)' },
+  BOR: EMBARQUE,
+  EMB: EMBARQUE,
+  BRD: EMBARQUE,
+  ULL: ULTIMA,
+  LSC: ULTIMA,
   CER: TERMINADO,
   CLS: TERMINADO,
   RDY: TERMINADO,
   OBK: TERMINADO,
   AIR: TERMINADO,
-  RET: { color: COLORES_ALERTA.aviso, variante: 'filled', icono: '!' },
-  CAN: { color: COLORES_ALERTA.critico, variante: 'filled', icono: '✕' },
+  RET: { variante: 'filled', color: TINTAS.ambar, Icono: TriangleAlert, linea: TINTAS.ambar },
+  CAN: { variante: 'filled', color: TINTAS.rojo, Icono: X, linea: TINTAS.rojo },
 }
 
+const SIN_ESTADO: EstiloEstado = { variante: 'outline', color: NEUTRO_TENUE, Icono: Clock, linea: 'var(--mantine-color-dimmed)' }
+
 export function estiloEstado(codigo: string | null | undefined): EstiloEstado {
-  return (codigo && ESTILOS[codigo]) || { color: 'gray', variante: 'outline', icono: '·' }
+  return (codigo && ESTILOS[codigo]) || SIN_ESTADO
 }
 
 /** Nivel del retraso: hasta el umbral de puntualidad (incluido) el vuelo es puntual; por encima, alerta. */

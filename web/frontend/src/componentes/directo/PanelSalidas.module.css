@@ -1,0 +1,123 @@
+/* El panel en directo: negro en los dos temas, letra pintada, ámbar y rojo solo para alertas. */
+
+.panel {
+  padding: 6px 4px;
+}
+
+.tabla {
+  --table-border-color: #222;
+  --table-hover-color: #171717;
+  color: var(--tinta-pintura);
+  font-size: 0.875rem;
+}
+
+.tabla thead th {
+  font-family: var(--fuente-paleta);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9a968c;
+  background: #0d0d0d;
+  border-bottom: 1px solid #262626;
+}
+
+.fila {
+  cursor: pointer;
+  transition: background-color 120ms ease-out;
+}
+
+.fila:hover {
+  background: #171717;
+}
+
+.hora {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  font-family: var(--fuente-paleta);
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.fecha {
+  display: block;
+  margin-top: 3px;
+  font-family: system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  color: #a19d94;
+}
+
+.sinSalto {
+  white-space: nowrap;
+}
+
+.estimada {
+  margin-right: 8px;
+}
+
+.vuelo {
+  color: inherit;
+  display: block;
+}
+
+.codigo {
+  font-family: var(--fuente-paleta);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.aerolinea {
+  margin-left: 8px;
+  font-size: 0.75rem;
+  color: #a19d94;
+}
+
+.otrosCodigos {
+  display: block;
+  font-size: 0.75rem;
+  color: #8f8b83;
+}
+
+.iata {
+  font-family: var(--fuente-paleta);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.puerta {
+  font-family: var(--fuente-paleta);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.pila {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.capas {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.capa {
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--tinta-pintura);
+}
+
+.numeroCambios {
+  font-size: 0.6875rem;
+  color: #a19d94;
+}

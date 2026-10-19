@@ -96,7 +96,7 @@ export function Rutas() {
   return (
     <Stack gap="lg">
       <div>
-        <Title order={2} fz={28}>
+        <Title order={1} className="titulo-pagina">
           {textos.rutas.titulo}
         </Title>
         <Text c="dimmed">{textos.rutas.subtitulo}</Text>

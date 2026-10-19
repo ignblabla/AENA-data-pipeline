@@ -115,6 +115,7 @@ def test_panel_directo(cliente):
     # Código compartido agrupado en una fila
     assert [c["num_vuelo"] for c in lhr["codigos"]] == ["2", "9"]
     assert lhr["retraso_min"] == 160 and lhr["estado_nombre"] == "Embarcando"
+    assert lhr["n_cambios"] == 2  # MAD_2 tiene dos eventos en el histórico
     assert pmi["destino_iata"] == "PMI" and pmi["mostrador"] is None  # "null-null" se normaliza
     assert len(cliente.get("/api/directo/MAD", params={"limite": 1}).json()["vuelos"]) == 1
     assert cliente.get("/api/directo/XXX").status_code == 404
@@ -136,3 +137,14 @@ def test_historial_vuelo(cliente):
     }
     assert segundo["retraso_min"] == 30
     assert cliente.get("/api/vuelos/historial", params={"clave": "no-existe"}).status_code == 404
+
+
+def test_proyecto(cliente):
+    p = cliente.get("/api/proyecto").json()
+    assert p["eventos"] == 8 and p["vuelos"] == 7 and p["salidas"] == 6
+    assert p["aeropuertos"] == 2 and p["destinos"] == 4
+    assert p["paises"] == 2  # BCN/MAD (ES) y LHR (GB); PMI no tiene coordenadas en la referencia
+    assert p["primera_deteccion"] == "2026-01-01T09:00:00"
+    assert p["rutas"] == 4  # MAD→LHR, MAD→BCN, MAD→PMI, BCN→MAD
+    assert p["particiones"] == 4  # MAD 01-01, MAD 01-02, BCN 01-02, BCN 01-03
+    assert p["cambios_ultima_pasada"] == 1  # solo el evento de las 08:00 del 03/01

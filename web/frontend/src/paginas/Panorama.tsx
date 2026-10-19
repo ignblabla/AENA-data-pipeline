@@ -1,4 +1,4 @@
-import { Center, Grid, Loader, SimpleGrid, Stack } from '@mantine/core'
+import { Center, Grid, Loader, SimpleGrid, Stack, Text, Title } from '@mantine/core'
 import { lazy, Suspense, useMemo } from 'react'
 import { useNavigate } from 'react-router'
 import { useMeta, useRankingAerolineas, useRankingAeropuertos, useRankingDestinos, useResumen, useSerie } from '../api/consultas'
@@ -61,6 +61,13 @@ export function Panorama() {
 
   return (
     <Stack gap="lg">
+      <div>
+        <Title order={1} className="titulo-pagina">
+          {textos.panorama.titulo}
+        </Title>
+        <Text c="dimmed">{textos.panorama.subtitulo}</Text>
+      </div>
+
       <BarraFiltros />
 
       <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }} spacing="md">

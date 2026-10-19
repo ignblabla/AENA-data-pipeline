@@ -27,6 +27,27 @@
         }
       }
     },
+    "/api/proyecto": {
+      "get": {
+        "tags": [
+          "meta"
+        ],
+        "summary": "Cifras globales del histórico (para la portada)",
+        "operationId": "proyecto_api_proyecto_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Proyecto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/resumen": {
       "get": {
         "tags": [
@@ -1584,6 +1605,77 @@
         ],
         "title": "PanelDirecto"
       },
+      "Proyecto": {
+        "properties": {
+          "eventos": {
+            "type": "integer",
+            "title": "Eventos",
+            "description": "Cambios registrados por el pipeline en todo el histórico"
+          },
+          "vuelos": {
+            "type": "integer",
+            "title": "Vuelos",
+            "description": "Vuelos comerciales distintos (cada código compartido cuenta)"
+          },
+          "salidas": {
+            "type": "integer",
+            "title": "Salidas",
+            "description": "Salidas físicas distintas"
+          },
+          "destinos": {
+            "type": "integer",
+            "title": "Destinos"
+          },
+          "paises": {
+            "type": "integer",
+            "title": "Paises"
+          },
+          "aeropuertos": {
+            "type": "integer",
+            "title": "Aeropuertos"
+          },
+          "rutas": {
+            "type": "integer",
+            "title": "Rutas",
+            "description": "Pares aeropuerto de origen → destino distintos"
+          },
+          "particiones": {
+            "type": "integer",
+            "title": "Particiones",
+            "description": "Archivos del histórico (un Parquet por aeropuerto y día)"
+          },
+          "cambios_ultima_pasada": {
+            "type": "integer",
+            "title": "Cambios Ultima Pasada",
+            "description": "Cambios detectados en la última ejecución del pipeline"
+          },
+          "primera_deteccion": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Primera Deteccion"
+          },
+          "ultima_deteccion": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ultima Deteccion"
+          }
+        },
+        "type": "object",
+        "required": [
+          "eventos",
+          "vuelos",
+          "salidas",
+          "destinos",
+          "paises",
+          "aeropuertos",
+          "rutas",
+          "particiones",
+          "cambios_ultima_pasada",
+          "primera_deteccion",
+          "ultima_deteccion"
+        ],
+        "title": "Proyecto"
+      },
       "PuntoSerie": {
         "properties": {
           "salidas": {
@@ -2151,6 +2243,11 @@
               }
             ],
             "title": "Tipo Aeronave"
+          },
+          "n_cambios": {
+            "type": "integer",
+            "title": "N Cambios",
+            "description": "Cambios registrados en el histórico para el primer código de esta salida"
           }
         },
         "type": "object",
@@ -2167,7 +2264,8 @@
           "terminal",
           "puerta",
           "mostrador",
-          "tipo_aeronave"
+          "tipo_aeronave",
+          "n_cambios"
         ],
         "title": "VueloPanel"
       }

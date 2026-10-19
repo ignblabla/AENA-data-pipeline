@@ -1,0 +1,299 @@
+/* Portada: el vestíbulo. A la izquierda el panel de salidas; a la derecha el cartel y la acción. */
+
+.vestibulo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.72fr) minmax(300px, 1fr);
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'panel cartel'
+    'panel accion';
+  gap: clamp(14px, 1.8vw, 24px) clamp(16px, 2vw, 28px);
+  align-items: start;
+}
+
+.panel {
+  grid-area: panel;
+  min-width: 0;
+}
+
+.accion {
+  grid-area: accion;
+}
+
+.reloj {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.etiquetaReloj {
+  font-family: var(--fuente-paleta);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9a968c;
+}
+
+.panelInterior {
+  padding: clamp(14px, 2vw, 28px);
+}
+
+.pieTablero {
+  color: #9a968c;
+  letter-spacing: 0.02em;
+}
+
+.cartel {
+  grid-area: cartel;
+  margin: 0;
+  min-width: 0;
+}
+
+.foto {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: 38% 45%;
+  border-radius: 3px 3px 0 0;
+}
+
+.textoCartel {
+  padding: 18px 22px 18px;
+  border-radius: 0 0 3px 3px;
+}
+
+.titular {
+  font-family: var(--fuente-paleta);
+  font-size: clamp(1.75rem, 2.55vw, 2.75rem);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  color: var(--tinta-pintura);
+  text-wrap: balance;
+}
+
+.entradilla {
+  margin-top: 10px;
+  color: #c4c0b6;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  max-width: 48ch;
+}
+
+.credito {
+  margin-top: 12px;
+  color: #8f8b83;
+  font-size: 0.75rem;
+}
+
+.registro {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0 clamp(12px, 1.6vw, 24px);
+  margin: clamp(14px, 1.6vw, 22px) 0 0;
+  padding-top: clamp(12px, 1.4vw, 18px);
+  border-top: 1px solid #262626;
+}
+
+.cifra {
+  min-width: 0;
+  container-type: inline-size;
+}
+
+.cifra dt {
+  font-family: var(--fuente-paleta);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9a968c;
+  margin-bottom: 6px;
+}
+
+.cifra dd {
+  margin: 0;
+}
+
+/* --- Secciones bajo la primera pantalla -------------------------------------- */
+
+.seccion {
+  padding-top: clamp(64px, 9vw, 120px);
+}
+
+.tituloSeccion {
+  font-family: var(--fuente-paleta);
+  font-size: clamp(2.25rem, 4.2vw, 3.5rem);
+  line-height: 1;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+/* El recorrido del dato: un segundo panel, cada paso en paletas con su cifra real */
+.recorrido {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.recorrido tr + tr > * {
+  border-top: 1px solid #1f1f1f;
+}
+
+.paso {
+  padding: 16px 18px 16px clamp(12px, 2vw, 24px);
+  text-align: left;
+  font-size: clamp(18px, 1.8vw, 26px);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.cifraPaso {
+  padding: 16px 18px;
+  font-size: clamp(18px, 1.8vw, 26px);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.unidad {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: #9a968c;
+  text-align: right;
+}
+
+.textoPaso {
+  padding: 16px clamp(12px, 2vw, 24px) 16px 18px;
+  color: #c4c0b6;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  vertical-align: middle;
+}
+
+/* Embarque: cada sección es una puerta del panel */
+.puertas {
+  margin-top: 20px;
+}
+
+.puertas ul {
+  list-style: none;
+  margin: 0;
+  padding: 6px clamp(10px, 2vw, 22px);
+}
+
+.puertas li + li {
+  border-top: 1px solid #1f1f1f;
+}
+
+.puerta {
+  display: grid;
+  grid-template-columns: auto minmax(150px, 240px) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(14px, 2vw, 28px);
+  padding: 18px 10px;
+  color: var(--tinta-pintura);
+  text-decoration: none;
+  border-radius: 2px;
+  transition: background-color 140ms ease-out;
+}
+
+.puerta:hover {
+  background: #171717;
+}
+
+.nombrePuerta {
+  font-family: var(--fuente-paleta);
+  font-size: clamp(1.4rem, 2vw, 1.875rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.textoPuerta {
+  color: #b9b5aa;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+
+.flechaPuerta {
+  color: #8f8b83;
+  transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), color 140ms ease-out;
+}
+
+.puerta:hover .flechaPuerta {
+  color: var(--tinta-ambar);
+  transform: translateX(4px);
+}
+
+.pie {
+  margin-top: clamp(72px, 9vw, 120px);
+  padding: 28px 0 12px;
+  border-top: 1px solid var(--mantine-color-default-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* --- Pantallas estrechas ----------------------------------------------------- */
+
+@media (max-width: 62em) {
+  .vestibulo {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    /* La acción principal sube justo después del panel: en el móvil cabe en la primera pantalla */
+    grid-template-areas:
+      'panel'
+      'accion'
+      'cartel';
+  }
+}
+
+@media (max-width: 48em) {
+  .registro {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .recorrido,
+  .recorrido tbody {
+    display: block;
+  }
+
+  .recorrido tr {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    padding: 12px 10px;
+  }
+
+  .recorrido tr + tr > * {
+    border-top: 0;
+  }
+
+  .recorrido tr + tr {
+    border-top: 1px solid #1f1f1f;
+  }
+
+  .paso,
+  .cifraPaso {
+    padding: 0 6px;
+  }
+
+  .textoPaso {
+    grid-column: 1 / -1;
+    padding: 8px 6px 0;
+  }
+
+  .puerta {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .textoPuerta {
+    grid-column: 2 / 3;
+    grid-row: 2;
+  }
+}

@@ -21,6 +21,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/proyecto": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Cifras globales del histórico (para la portada) */
+        get: operations["proyecto_api_proyecto_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/resumen": {
         parameters: {
             query?: never;
@@ -456,6 +473,55 @@ export interface components {
             /** Vuelos */
             vuelos: components["schemas"]["VueloPanel"][];
         };
+        /** Proyecto */
+        Proyecto: {
+            /**
+             * Eventos
+             * @description Cambios registrados por el pipeline en todo el histórico
+             */
+            eventos: number;
+            /**
+             * Vuelos
+             * @description Vuelos comerciales distintos (cada código compartido cuenta)
+             */
+            vuelos: number;
+            /**
+             * Salidas
+             * @description Salidas físicas distintas
+             */
+            salidas: number;
+            /** Destinos */
+            destinos: number;
+            /** Paises */
+            paises: number;
+            /** Aeropuertos */
+            aeropuertos: number;
+            /**
+             * Rutas
+             * @description Pares aeropuerto de origen → destino distintos
+             */
+            rutas: number;
+            /**
+             * Particiones
+             * @description Archivos del histórico (un Parquet por aeropuerto y día)
+             */
+            particiones: number;
+            /**
+             * Cambios Ultima Pasada
+             * @description Cambios detectados en la última ejecución del pipeline
+             */
+            cambios_ultima_pasada: number;
+            /**
+             * Primera Deteccion
+             * Format: date-time
+             */
+            primera_deteccion: string;
+            /**
+             * Ultima Deteccion
+             * Format: date-time
+             */
+            ultima_deteccion: string;
+        };
         /** PuntoSerie */
         PuntoSerie: {
             /**
@@ -704,6 +770,11 @@ export interface components {
             mostrador: string | null;
             /** Tipo Aeronave */
             tipo_aeronave: string | null;
+            /**
+             * N Cambios
+             * @description Cambios registrados en el histórico para el primer código de esta salida
+             */
+            n_cambios: number;
         };
     };
     responses: never;
@@ -730,6 +801,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Meta"];
+                };
+            };
+        };
+    };
+    proyecto_api_proyecto_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Proyecto"];
                 };
             };
         };

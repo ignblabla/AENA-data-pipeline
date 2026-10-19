@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-18T22:55:00+02:00",
+  "title": "Design System: Vuelos de salida · AENA",
+  "extensions": {
+    "colorMeta": {
+      "lamp-amber": { "role": "primary", "displayName": "Lamp Amber", "canonical": "#f2a900", "tonalRamp": ["#704b00", "#946400", "#b87d00", "#d99500", "#f2a900", "#f8c22e", "#ffe28a", "#fff8e1"] },
+      "cancel-red": { "role": "secondary", "displayName": "Cancel Red", "canonical": "#c8372d", "tonalRamp": ["#4a1310", "#6e1d18", "#952720", "#c8372d", "#e0564c", "#ec8a82", "#f5bdb8", "#fbe6e4"] },
+      "flap-black": { "role": "neutral", "displayName": "Flap Black", "canonical": "#141414", "tonalRamp": ["#0d0d0d", "#141414", "#1c1c1c", "#2c3034", "#4a4f54", "#6b7177", "#a9aeb2", "#dcdfe1"] },
+      "paint-white": { "role": "neutral", "displayName": "Paint White", "canonical": "#f2efe6", "tonalRamp": ["#3a3e42", "#62666a", "#8f8b83", "#a19d94", "#c4c0b6", "#dedbd2", "#f2efe6", "#faf9f5"] },
+      "concourse-day": { "role": "neutral", "displayName": "Concourse (day)", "canonical": "#dfe2e4", "tonalRamp": ["#4a4f54", "#6b7177", "#8e9296", "#a9aeb2", "#c9ccce", "#dfe2e4", "#eef0f1", "#f7f8f8"] },
+      "concourse-night": { "role": "neutral", "displayName": "Concourse (night)", "canonical": "#0e0f10", "tonalRamp": ["#050506", "#0a0b0c", "#0e0f10", "#17191b", "#26292c", "#3a3e42", "#4a4e52", "#62666a"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Front-page headline on the poster only." },
+      "headline": { "displayName": "Headline", "purpose": "Page h1s and front-page section titles." },
+      "title": { "displayName": "Title", "purpose": "Chart card titles and gate names." },
+      "flap": { "displayName": "Flap", "purpose": "One character per split-flap cell; size derived from the board width." },
+      "body": { "displayName": "Body", "purpose": "Descriptions and explanations; platform UI face, tabular numerals." },
+      "label": { "displayName": "Label", "purpose": "Board column headers, registry labels, navigation; never below 11px." }
+    },
+    "shadows": [
+      { "name": "frame-cast", "value": "inset 0 0 0 1px rgba(0,0,0,0.14), 0 18px 40px -18px rgba(0,0,0,0.45)", "purpose": "Steel frame around every board: inner edge plus one soft cast shadow on the concourse." },
+      { "name": "button-primary", "value": "0 10px 24px -14px rgba(0,0,0,0.6)", "purpose": "Amber flap button at rest; deepens to 0 14px 28px -14px on hover." }
+    ],
+    "motion": [
+      { "name": "flap-step", "value": "55ms per character, 22ms stagger per cell, 110ms per row, 2–5 steps", "purpose": "Split-flap cascade on change; instant swap under prefers-reduced-motion." },
+      { "name": "flap-fall", "value": "80ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Each flap's fall (rotateX from -70deg) as a character lands." },
+      { "name": "ease-out-expo", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Page transitions (300ms), status badge flips (220ms), gate arrow nudge." }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "48em", "purpose": "Board hides flight and gate columns; destination narrows to 9 cells; registry becomes 2×2." },
+      { "name": "lg", "value": "62em", "purpose": "Front page collapses to one column: board, action, poster." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button (amber flap)",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one primary action per surface, drawn as an amber split flap.",
+      "html": "<a class=\"ds-btn-flap\" href=\"#\">EXPLORAR LOS DATOS <svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a>",
+      "css": ".ds-btn-flap{display:inline-flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.1rem 1.4rem;border-radius:3px;background:linear-gradient(180deg,#f6b519 0 50%,#f2a900 50% 100%);color:#141414;font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-size:1.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;position:relative;box-shadow:0 10px 24px -14px rgba(0,0,0,.6);transition:transform 120ms ease-out,box-shadow 120ms ease-out}.ds-btn-flap::after{content:'';position:absolute;left:0;right:0;top:calc(50% - .5px);height:1px;background:rgba(0,0,0,.25)}.ds-btn-flap:hover{transform:translateY(-1px);box-shadow:0 14px 28px -14px rgba(0,0,0,.7)}.ds-btn-flap:focus-visible{outline:2px solid #f2a900;outline-offset:2px}"
+    },
+    {
+      "name": "Flap cells",
+      "kind": "custom",
+      "refersTo": "flap-cell",
+      "description": "Text in fixed split-flap cells; the real text sits in a visually hidden span.",
+      "html": "<span class=\"ds-flap\"><span class=\"ds-cell\">M</span><span class=\"ds-cell\">A</span><span class=\"ds-cell\">D</span><span class=\"ds-cell\"></span></span>",
+      "css": ".ds-flap{display:inline-flex;gap:.09em;font:700 28px/1 'Barlow Condensed','Arial Narrow',sans-serif}.ds-cell{position:relative;display:inline-grid;place-items:center;width:.72em;height:1.22em;border-radius:.08em;background:linear-gradient(180deg,#1c1c1c 0 50%,#141414 50% 100%);color:#f2efe6;text-transform:uppercase;overflow:hidden}.ds-cell::after{content:'';position:absolute;left:0;right:0;top:calc(50% - .5px);height:1px;background:rgba(0,0,0,.9)}"
+    },
+    {
+      "name": "Board in steel frame",
+      "kind": "card",
+      "refersTo": "board",
+      "description": "A black departures board in a flat steel frame; every list of departures, steps or figures lives here.",
+      "html": "<div class=\"ds-frame\"><div class=\"ds-board\"><span class=\"ds-lamp ds-lamp-late\"></span> 21:10 FR154 BRISTOL <span class=\"ds-amber\">+88 MIN</span></div></div>",
+      "css": ".ds-frame{padding:12px;border-radius:6px;background:#9a9fa3;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14),0 18px 40px -18px rgba(0,0,0,.45)}.ds-board{background:#0d0d0d;border-radius:3px;color:#f2efe6;padding:20px;font:700 20px/1 'Barlow Condensed','Arial Narrow',sans-serif;letter-spacing:.06em}.ds-lamp{display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:#2a2a2a;margin-right:10px}.ds-lamp-late{background:#f2a900;box-shadow:0 0 0 3px rgba(242,169,0,.18)}.ds-amber{color:#f2a900}"
+    },
+    {
+      "name": "Navigation link",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Header links on the steel strip; the active page is a black flap.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-link ds-active\" href=\"#\">PANORAMA</a><a class=\"ds-nav-link\" href=\"#\">RUTAS</a></nav>",
+      "css": ".ds-nav{display:flex;gap:2px;background:#c9ccce;padding:12px}.ds-nav-link{padding:6px 12px;border-radius:2px;font:600 1.0625rem 'Barlow Condensed','Arial Narrow',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#141414;text-decoration:none;transition:background-color 120ms ease-out}.ds-nav-link:hover{background:rgba(20,20,20,.08)}.ds-nav-link:focus-visible{outline:2px solid #f2a900;outline-offset:2px}.ds-active{background:#141414;color:#f2efe6}"
+    },
+    {
+      "name": "Status badge (delayed)",
+      "kind": "chip",
+      "refersTo": "flap-cell",
+      "description": "Status badges on the board always carry an icon and text; amber for delays, red for cancellations only.",
+      "html": "<span class=\"ds-badge ds-badge-late\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\"/><path d=\"M12 9v4\"/><path d=\"M12 17h.01\"/></svg>Retrasado</span>",
+      "css": ".ds-badge{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:2px;font:600 12px system-ui,sans-serif}.ds-badge-late{background:#f2a900;color:#141414}"
+    },
+    {
+      "name": "Plate (chart card)",
+      "kind": "card",
+      "refersTo": "plate",
+      "description": "Flat steel plate holding a chart; condensed uppercase title, muted subtitle, no shadow.",
+      "html": "<section class=\"ds-plate\"><h3 class=\"ds-plate-title\">EVOLUCIÓN</h3><p class=\"ds-plate-sub\">Salidas · todos los aeropuertos</p></section>",
+      "css": ".ds-plate{background:#f7f8f8;border:1px solid #c3c7ca;border-radius:4px;padding:24px;color:#141414}.ds-plate-title{margin:0;font:700 1.25rem/1.15 'Barlow Condensed','Arial Narrow',sans-serif;letter-spacing:.03em;text-transform:uppercase}.ds-plate-sub{margin:4px 0 0;font:400 .875rem system-ui,sans-serif;color:#565c62}"
+    }
+  ],
+  "narrative": {
+    "northStar": "El panel de paletas",
+    "overview": "The whole site is a split-flap departures board seen in a concourse. Real figures fall into fixed character cells letter by letter, the board is always matte black with painted white lettering, and everything around it is steel: light, flat steel by day, a dark hall by night. The board is not a picture of a board; it is the working interface, a semantic table whose cells happen to be flaps, with the real text always available underneath. Density is the board's: fixed columns, ranked rows, tabular numerals, and nothing decorative between them. Colour is almost absent on purpose, so that the two signal inks mean exactly one thing each.",
+    "keyCharacteristics": [
+      "Four inks only: flap black, paint white, lamp amber (late or changing now), cancel red (cancelled).",
+      "Condensed uppercase lettering in fixed cells; system UI type for reading.",
+      "Flat steel frames around every board; no imitated textures.",
+      "One credited photograph per surface at most, framed like a concourse poster.",
+      "Motion is the flap: a character-by-character cascade, reduced to a direct swap when the system asks for less motion."
+    ],
+    "rules": [
+      { "name": "The One Meaning Rule", "body": "Amber means late, changing or \"act here\"; red means cancelled. If a third meaning appears, it gets neither colour.", "section": "colors" },
+      { "name": "The Ink Data Rule", "body": "Chart series are drawn in ink (flap black by day, paint white by night) on steel plates; sequential ramps run from the plate tone to the ink. Status colours never paint a data series.", "section": "colors" },
+      { "name": "The Cell Rule", "body": "Announced text lives in fixed cells: a value that does not fit is shortened at a word boundary, the way real boards abbreviate, never cut mid-word.", "section": "typography" },
+      { "name": "The Frame Rule", "body": "Only framed boards and the primary button cast shadows; plates and controls are flat.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do put lists of departures, steps and figures in fixed flap cells inside a steel-framed black board.",
+      "Do keep amber (#f2a900) for delays, the board clock and the primary action, and red (#c8372d) for cancellations only.",
+      "Do draw chart data in ink on steel plates, with sequential ramps from plate tone to ink.",
+      "Do credit every photograph next to it (author, licence, source) and embed its origin in the file.",
+      "Do keep the real text of every flap available to assistive technology and honour prefers-reduced-motion."
+    ],
+    "donts": [
+      "Don't imitate materials in CSS (pinstripe \"brushed steel\", fake grain); steel is flat tone.",
+      "Don't use AENA or airline branding, logos or liveries; this is an independent project.",
+      "Don't add more than one photograph per surface, or photographs without a clear role.",
+      "Don't use emoji or Unicode glyphs as icons; icons are Lucide line icons.",
+      "Don't set announced text in the system face, or reading text in the condensed face."
+    ]
+  }
+}

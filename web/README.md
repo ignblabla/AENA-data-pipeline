@@ -60,7 +60,13 @@ Filtros globales (periodo y métrica, más aeropuertos en el panorama) guardados
 cualquier vista se puede compartir copiando el enlace. Cada gráfico tiene una vista de **tabla**,
 y hay modo claro/oscuro con el botón de la cabecera.
 
-**Panorama** (`/`)
+**Portada** (`/`)
+- Presenta el proyecto como un **panel de salidas de paletas abatibles**: las próximas salidas reales
+  del aeropuerto elegido caen letra a letra, con el reloj de la última extracción y las cifras del
+  histórico al pie. A la derecha, el cartel con la fotografía y la acción «Explorar los datos».
+- Debajo, el recorrido de un dato cada 10 minutos (con cifras reales) y las secciones como puertas de embarque.
+
+**Panorama** (`/panorama`; los enlaces antiguos a `/?metrica=…` redirigen aquí)
 - Indicadores: salidas, retraso medio estimado, puntualidad y cancelaciones.
 - **Mapa** de los 11 aeropuertos (con recuadro de Canarias): tamaño = salidas, color = métrica elegida.
   Pulsar un aeropuerto abre su detalle.
@@ -157,8 +163,23 @@ también `&aeropuertos=MAD&aeropuertos=BCN`.
 | `componentes/graficos/` | `Grafico.tsx` (envoltorio único de ECharts), `opciones.ts` (estilo común) y los gráficos concretos |
 | `componentes/mapa/` | Mapas con MapLibre GL (`base.ts`, común): aeropuertos y rutas (este con capas de deck.gl). Se descargan solo cuando se muestran |
 | `componentes/directo/` | Panel de salidas, insignias de estado/retraso e historial de un vuelo |
-| `paginas/` | Una página por ruta: `Panorama`, `Aeropuerto`, `Rutas` y `Directo` |
+| `paginas/` | Una página por ruta: `Portada`, `Panorama`, `Aeropuerto`, `Rutas` y `Directo` |
+| `componentes/panel/` | `Paleta` (texto en paletas abatibles con su animación en cascada) y `Tablero` (panel de salidas sobre una tabla semántica) |
 | `textos.ts` | Todos los textos de la interfaz |
+
+### Diseño
+
+El mundo visual es **«el panel de paletas»**: cuatro tintas (negro de paleta, blanco de pintura, ámbar
+solo para retrasos y lo que cambia, rojo solo para cancelaciones) sobre acero liso, con Barlow Condensed
+(autoalojada) para lo que se anuncia y la tipografía del sistema para leer. Está documentado en
+[`DESIGN.md`](../DESIGN.md) (tokens y reglas) y [`.impeccable/design.json`](../.impeccable/design.json);
+el contexto del producto, en [`PRODUCT.md`](../PRODUCT.md). Se diseñó con la skill Impeccable.
+
+**Fotografía:** `public/imagenes/avion-aproximacion-palma.jpg`, «Airplane approaching to Palma de
+Mallorca airport» de Abrget47j, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0), vía
+[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Airplane_approaching_to_Palma_de_Mallorca_airport.jpg).
+El crédito aparece en la portada y el origen va incrustado en el propio archivo; los datos de licencia
+están en `public/imagenes/credits.json`.
 
 El **mapa base** es el de [CARTO](https://carto.com/basemaps) (claro u oscuro según el tema), gratuito
 con atribución y sin clave de API. Necesita conexión a internet: sin ella, los aeropuertos se siguen
