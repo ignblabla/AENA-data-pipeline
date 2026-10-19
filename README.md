@@ -9,10 +9,13 @@
 ![PyArrow](https://img.shields.io/badge/PyArrow-Parquet-11557C?logo=apacheparquet&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-scheduled_ETL-2088FF?logo=githubactions&logoColor=white)
 ![Requests](https://img.shields.io/badge/Requests-HTTP_client-000000?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)
+![DuckDB](https://img.shields.io/badge/DuckDB-analítica-FFF000?logo=duckdb&logoColor=black)
+![React](https://img.shields.io/badge/React-TypeScript-61DAFB?logo=react&logoColor=black)
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)
 ![Status](https://img.shields.io/badge/Status-en_producción-brightgreen)
 
-**Extrae, limpia y versiona el estado de cada vuelo de salida de AENA cada 10 minutos**, convirtiendo el "estado en directo" de los paneles de los aeropuertos en un histórico estructurado y analizable.
+**Extrae, limpia y versiona el estado de cada vuelo de salida de AENA cada 10 minutos**, convirtiendo el "estado en directo" de los paneles de los aeropuertos en un histórico estructurado y analizable, con una **web propia para explorarlo**.
 
 </div>
 
@@ -96,6 +99,26 @@ Por cada vuelo de salida capturado se extraen: **número de vuelo, aerolínea (I
 
 ---
 
+## 🖥️ Web de exploración
+
+Sobre el histórico hay una web local (carpeta [`web/`](web/)) para explorar los datos: un backend en **FastAPI + DuckDB** que lee los Parquet y expone una API tipada, y un frontend en **React + TypeScript** con **ECharts**, **MapLibre** y **deck.gl**. Toda la interfaz está en español y tiene modo claro y oscuro.
+
+![Portada: panel de salidas de paletas con las próximas salidas reales](docs/capturas/portada.png)
+
+| Página | Qué muestra |
+|---|---|
+| **Portada** (`/`) | Un panel de salidas de paletas con las salidas reales de la última extracción, que caen letra a letra, y las cifras del histórico |
+| **Panorama** (`/panorama`) | Indicadores de los 11 aeropuertos, mapa, ranking, evolución por día, semana o mes, destinos y aerolíneas |
+| **Aeropuerto** (`/aeropuerto/MAD`…) | Cada aeropuerto a fondo: mapa de calor por día y hora, distribución de retrasos y puntualidad por aerolínea |
+| **Rutas** (`/rutas`) | Todas las rutas sobre el mapa del mundo, con arcos geodésicos animados |
+| **En directo** (`/directo/MAD`…) | El panel de salidas de la última foto del pipeline y el **historial de cada vuelo, cambio a cambio** |
+
+![Panorama: indicadores, mapa de España y ranking de puntualidad](docs/capturas/panorama.png)
+
+Los filtros (periodo, aeropuertos, métrica) viven en la URL, así que cualquier vista se puede compartir, y cada gráfico tiene una vista de tabla. Cómo arrancarla, los endpoints de la API y la arquitectura están en [`web/README.md`](web/README.md); el sistema de diseño («el panel de paletas»), en [`DESIGN.md`](DESIGN.md).
+
+---
+
 ## 🛠️ Tech stack y decisiones de diseño
 
 | Rol | Herramienta |
@@ -106,6 +129,9 @@ Por cada vuelo de salida capturado se extraen: **número de vuelo, aerolínea (I
 | Persistencia de estado | **Pickle** (`estado_actual/*.pkl`) por aeropuerto |
 | Almacén de histórico | **Parquet particionado** al estilo Hive (`aeropuerto=IATA/fecha=AAAA-MM-DD/datos.parquet`) vía **pyarrow** |
 | Control de versiones de los datos | **Git** — cada ejecución hace commit de `data/` si hubo cambios |
+| API de la web | **FastAPI** + **DuckDB** (consultas en memoria sobre los Parquet) + **Pydantic** |
+| Frontend de la web | **React** + **TypeScript** + **Vite**, **ECharts**, **MapLibre GL**, **deck.gl**, **Mantine**, **TanStack Query** |
+| Tests | **pytest** sobre la API de la web |
 
 **Por qué esta pila y no otra:** el volumen de datos (11 llamadas cada 10-15 min, decenas de filas de cambio por ejecución) no justifica el coste operativo de un *data warehouse* gestionado, un orquestador como Airflow o un contenedor Docker persistente. GitHub Actions ya ofrece *scheduling*, cómputo efímero y almacenamiento (el propio repositorio Git) sin coste ni mantenimiento adicional, y pandas es más que suficiente para el volumen manejado. Esta es una decisión de **escala apropiada**, no una limitación: el diseño modular de `extract.py` / `transform.py` / `load.py` ya ha permitido sustituir el CSV *append-only* original por Parquet particionado (ver [Roadmap](#-roadmap-y-estado-del-proyecto)) sin tocar la lógica de negocio de Extract ni Transform, y permitiría igualmente sustituir el pickle por PostgreSQL el día que el volumen lo justifique.
 
@@ -136,19 +162,25 @@ data/historico_parquet/
 | `terminal`, `puerta`, `mostrador`, `tipo_aeronave` | str | Detalles operativos |
 | `detectado_en` | datetime | Instante en que el pipeline detectó el cambio |
 
-El particionado por `aeropuerto`/`fecha` permite leer solo lo necesario con `pandas.read_parquet()` (o cualquier motor compatible con particiones Hive, como DuckDB), en vez de cargar el histórico completo en memoria:
+El particionado por `aeropuerto`/`fecha` permite leer solo lo necesario, en vez de cargar el histórico completo en memoria:
 
 ```python
+import duckdb
 import pandas as pd
 
-# Solo el histórico de Sevilla del 14 de septiembre de 2026
-df = pd.read_parquet("data/historico_parquet/aeropuerto=SVQ/fecha=2026-09-14/")
+# Solo el histórico de Sevilla del 1 de octubre de 2026
+df = pd.read_parquet("data/historico_parquet/aeropuerto=SVQ/fecha=2026-10-01/datos.parquet")
 
 # Todo el histórico disponible (todas las particiones)
-df_todo = pd.read_parquet("data/historico_parquet/")
+df_todo = duckdb.sql("""
+    SELECT * FROM read_parquet('data/historico_parquet/*/*/datos.parquet',
+                               hive_partitioning = false, union_by_name = true)
+""").df()
 ```
 
-**`data/estado_actual/<IATA>.pkl`** — última foto completa de todos los vuelos vistos de ese aeropuerto (uso interno, no pensado para lectura directa).
+> ⚠️ `pd.read_parquet("data/historico_parquet/")` sobre la carpeta raíz **falla**: la columna `aeropuerto` está dentro de cada archivo y también en la ruta (`aeropuerto=XXX`), y pyarrow no puede fusionarlas. Por eso se lee con `hive_partitioning = false`.
+
+**`data/estado_actual/<IATA>.pkl`** — última foto completa de todos los vuelos vistos de ese aeropuerto. La usa el pipeline para comparar y la web para el panel «En directo».
 
 **Reglas de calidad implementadas:**
 - **Deduplicación** por `clave_vuelo` dentro de cada extracción (`drop_duplicates`).
@@ -157,6 +189,7 @@ df_todo = pd.read_parquet("data/historico_parquet/")
 - **Tolerancia a fallos por aeropuerto**: si falla la extracción de uno, el resto continúa; el aeropuerto fallido simplemente no actualiza su estado en esa ejecución.
 - **Reintentos de red** (hasta 2 intentos, con espera entre ellos) y manejo explícito de `JSONDecodeError` si AENA responde con contenido no válido.
 - **Consolidación de particiones**: en vez de añadir un archivo Parquet nuevo por ejecución, cada corrida reescribe la partición del día combinando lo existente con los cambios nuevos, manteniendo acotado el número de archivos por aeropuerto/día.
+- **Ejecuciones que no se pisan**: el workflow se pone en cola en lugar de cancelar una ejecución a mitad, parte siempre del último `main` y solo se lanza por push cuando cambia el propio pipeline. Si al subir datos choca con otra ejecución (los `.parquet` y `.pkl` son binarios y Git no puede fusionarlos), aborta, rehace el ETL sobre el estado más reciente y reintenta, sin perder detecciones.
 
 ---
 
@@ -180,6 +213,14 @@ python main.py
 
 Tras la ejecución, revisa `data/historico_parquet/` (cambios detectados, particionados por `aeropuerto`/`fecha`) y `data/estado_actual/` (foto completa por aeropuerto). No se necesita ninguna clave de API ni variable de entorno.
 
+**La web de exploración** (requiere además Node.js 20+):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File web\arrancar.ps1      # Windows: backend y frontend en dos ventanas
+```
+
+y abre <http://localhost:5173>. Los pasos manuales, y una tarea programada opcional que hace `git pull` cada 10 minutos para que la web muestre los datos más recientes, están en [`web/README.md`](web/README.md).
+
 Para que se ejecute solo cada 10-15 minutos sin intervención, el repositorio ya incluye el workflow `.github/workflows/etl.yml`, que instala dependencias, corre `main.py` y hace commit/push de `data/` automáticamente si hubo cambios.
 
 > 📎 El repositorio incluye además `migrar_a_parquet.py`, un script de un solo uso ya ejecutado que migró el histórico original en `historico_vuelos.csv` al formato Parquet particionado actual. Se mantiene en el repo como referencia, pero no forma parte del pipeline recurrente.
@@ -188,7 +229,16 @@ Para que se ejecute solo cada 10-15 minutos sin intervención, el repositorio ya
 
 ## 📊 Insights (muestra del histórico acumulado)
 
-> Por completar
+Datos del 16 de septiembre al 18 de octubre de 2026 (días completos). El retraso es el **estimado** que publica el panel, no la hora real de despegue, y una salida es puntual con 15 minutos o menos de retraso estimado.
+
+- **Más de 2 millones de cambios registrados** en poco más de un mes, sobre unos 200.000 vuelos comerciales y 388 destinos en 97 países.
+- **Los códigos compartidos multiplican los vuelos por más de dos:** 186.472 vuelos comerciales corresponden a 83.798 salidas reales de avión (≈2,2 números de vuelo por salida).
+- **El 66 % de las salidas fue puntual**, con un retraso medio estimado de 19 minutos y un 0,8 % de cancelaciones.
+- **Grandes diferencias entre aeropuertos:** Tenerife Norte es el más puntual (80 %) y Gran Canaria le sigue (77 %); Barcelona (59,5 %) y Palma (59 %) cierran el ranking.
+- **El 67 % de las salidas va al extranjero.** Las rutas con más salidas son las interinsulares Tenerife Norte → Gran Canaria (859) y Gran Canaria → Tenerife Norte (828), por delante de Madrid → Palma (722).
+- **Entre las tres aerolíneas con más vuelos**, Vueling (73 %) e Iberia (71 %) son más puntuales que Ryanair (62 %).
+
+Todas estas cifras se pueden reproducir y filtrar en la web.
 
 ---
 
@@ -200,10 +250,14 @@ Para que se ejecute solo cada 10-15 minutos sin intervención, el repositorio ya
 - [x] Persistencia de estado por aeropuerto y ejecución automática vía GitHub Actions
 - [x] Manejo correcto de valores nulos/nunca-informados (`NaT`)
 - [x] Migrar `historico_vuelos.csv` a Parquet particionado por aeropuerto/día para reducir el peso del repositorio a medida que crece el histórico
+- [x] Web de exploración (FastAPI + DuckDB + React): portada, panorama, detalle por aeropuerto, mapa de rutas y panel en directo con el historial de cada vuelo
+- [x] Tests automatizados (`pytest`) de la API de la web
+- [x] Workflow a prueba de ejecuciones simultáneas (cola, último `main` y recuperación ante conflictos al subir datos)
 
 **Próximos pasos**
 - [ ] Añadir tests automatizados (`pytest`) para `extract`, `transform` y `load`
-- [ ] Dashboard de seguimiento (Streamlit o Grafana) sobre el histórico acumulado
+- [ ] Dashboards personalizables, comparador entre aeropuertos o periodos y exportación a CSV/PNG en la web
+- [ ] Desplegar la web para que sea accesible públicamente
 - [ ] Modelo de predicción de retrasos a partir del histórico de cambios de estado
 - [ ] Alertado de retrasos relevantes vía Telegram/Slack
 - [ ] Ampliar a vuelos de **llegada**, no solo de salida

@@ -12,3 +12,7 @@ raw/
 
 .DS_Store
 *.log
+
+.impeccable/decision/
+.impeccable/mocks/
+.impeccable/review/
