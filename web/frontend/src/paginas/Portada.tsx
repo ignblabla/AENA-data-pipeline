@@ -135,7 +135,7 @@ export function Portada() {
             <dl className={clases.registro} aria-label={textos.portada.registro}>
               {[
                 [textos.portada.cifras.eventos, p && formato.entero(p.eventos), 9],
-                [textos.portada.cifras.vuelos, p && formato.entero(p.vuelos), 7],
+                [textos.portada.cifras.salidas, p && formato.entero(p.salidas), 7],
                 [textos.portada.cifras.destinos, p && formato.entero(p.destinos), 3],
                 [textos.portada.cifras.paises, p && formato.entero(p.paises), 3],
               ].map(([etiqueta, valor, ancho], i) => (

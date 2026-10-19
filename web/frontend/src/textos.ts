@@ -23,7 +23,7 @@ export const textos = {
     registro: 'Registro del pipeline',
     cifras: {
       eventos: 'Cambios registrados',
-      vuelos: 'Vuelos seguidos',
+      salidas: 'Salidas',
       destinos: 'Destinos',
       paises: 'Países',
     },
