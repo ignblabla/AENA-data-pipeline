@@ -1,0 +1,426 @@
+{
+  "version": 1,
+  "aeropuerto": {
+    "iata": "MAD",
+    "nombre_corto": "Barajas",
+    "nombre": "Adolfo Suárez Madrid-Barajas"
+  },
+  "dia": "2026-10-19",
+  "dia_semana": "lunes",
+  "comparacion": {
+    "dia_normal": "media de los 4 lunes anteriores",
+    "dias_historico": 34
+  },
+  "calidad": {
+    "publicable": true,
+    "salidas_vs_normal": 1.0,
+    "huecos_pipeline": [],
+    "avisos": []
+  },
+  "diapositivas": [
+    {
+      "n": 1,
+      "tipo": "portada",
+      "titular": "Lunes de retrasos en Barajas: solo 1 de cada 2 vuelos salió puntual",
+      "subtitulo": "El segundo peor día desde que hay datos (16 de septiembre)",
+      "candidatos": [
+        {
+          "tipo": "top3_historico",
+          "puntos": 80,
+          "dato": "2.º peor día en puntualidad de 34"
+        },
+        {
+          "tipo": "desvio_fuerte",
+          "puntos": 60,
+          "dato": "-18,3 puntos de puntualidad frente a un lunes normal"
+        },
+        {
+          "tipo": "retraso_extremo",
+          "puntos": 50,
+          "dato": "4 h 41 min a Londres-Luton"
+        }
+      ],
+      "filas_panel": [
+        {
+          "hora": "12:30",
+          "vuelo": "W95356",
+          "destino": "Londres",
+          "retraso_min": 281
+        },
+        {
+          "hora": "15:45",
+          "vuelo": "IB5329",
+          "destino": "Florencia",
+          "retraso_min": 225
+        },
+        {
+          "hora": "22:55",
+          "vuelo": "W46016",
+          "destino": "Roma",
+          "retraso_min": 219
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "tipo": "cifras",
+      "indicadores": [
+        {
+          "id": "salidas",
+          "valor": 622,
+          "normal": 624,
+          "destacar": false
+        },
+        {
+          "id": "puntualidad_pct",
+          "valor": 48.3,
+          "normal": 66.6,
+          "destacar": true
+        },
+        {
+          "id": "retraso_medio_min",
+          "valor": 29.3,
+          "normal": 16.2,
+          "destacar": true
+        },
+        {
+          "id": "destinos",
+          "valor": 168,
+          "normal": 170,
+          "paises": 61,
+          "destacar": false
+        }
+      ]
+    },
+    {
+      "n": 3,
+      "tipo": "ranking",
+      "puesto": 7,
+      "de": 11,
+      "ranking_puntualidad_pct": [
+        {
+          "iata": "TFS",
+          "valor": 77.9
+        },
+        {
+          "iata": "LPA",
+          "valor": 75.1
+        },
+        {
+          "iata": "TFN",
+          "valor": 74.1
+        },
+        {
+          "iata": "SVQ",
+          "valor": 58.4
+        },
+        {
+          "iata": "SCQ",
+          "valor": 53.8
+        },
+        {
+          "iata": "MAH",
+          "valor": 48.9
+        },
+        {
+          "iata": "MAD",
+          "valor": 48.3
+        },
+        {
+          "iata": "AGP",
+          "valor": 42.9
+        },
+        {
+          "iata": "PMI",
+          "valor": 32.7
+        },
+        {
+          "iata": "VLC",
+          "valor": 32.3
+        },
+        {
+          "iata": "BCN",
+          "valor": 27.5
+        }
+      ],
+      "historico": {
+        "puesto_peor": 2,
+        "de_dias": 34,
+        "peor_dia": "2026-10-06",
+        "peor_valor": 46.6
+      }
+    },
+    {
+      "n": 4,
+      "tipo": "reloj",
+      "min_salidas_franja": 20,
+      "retraso_medio_por_hora": [
+        {
+          "h": 6,
+          "min": 14.7,
+          "salidas": 26
+        },
+        {
+          "h": 7,
+          "min": 14.5,
+          "salidas": 46
+        },
+        {
+          "h": 8,
+          "min": 14.4,
+          "salidas": 31
+        },
+        {
+          "h": 9,
+          "min": 29.2,
+          "salidas": 28
+        },
+        {
+          "h": 10,
+          "min": 22.4,
+          "salidas": 41
+        },
+        {
+          "h": 11,
+          "min": 28.7,
+          "salidas": 50
+        },
+        {
+          "h": 12,
+          "min": 41.4,
+          "salidas": 47
+        },
+        {
+          "h": 13,
+          "min": 41.2,
+          "salidas": 27
+        },
+        {
+          "h": 14,
+          "min": 34.5,
+          "salidas": 29
+        },
+        {
+          "h": 15,
+          "min": 36.3,
+          "salidas": 51
+        },
+        {
+          "h": 16,
+          "min": 35.2,
+          "salidas": 48
+        },
+        {
+          "h": 17,
+          "min": 34.5,
+          "salidas": 22
+        },
+        {
+          "h": 18,
+          "min": 36.8,
+          "salidas": 23
+        },
+        {
+          "h": 19,
+          "min": 29.7,
+          "salidas": 42
+        },
+        {
+          "h": 20,
+          "min": 31.7,
+          "salidas": 34
+        },
+        {
+          "h": 21,
+          "min": 29.0,
+          "salidas": 24
+        },
+        {
+          "h": 23,
+          "min": 24.5,
+          "salidas": 20
+        }
+      ],
+      "peor": {
+        "h": 12,
+        "min": 41.4
+      },
+      "mejor": {
+        "h": 8,
+        "min": 14.4
+      }
+    },
+    {
+      "n": 5,
+      "tipo": "peor_retraso",
+      "salida_programada": "12:30",
+      "destino": "Londres-Luton",
+      "vuelos": [
+        "Wizz Air W95356"
+      ],
+      "retraso_min": 281,
+      "contexto": {
+        "salidas_mas_1h": 88,
+        "salidas_retrasadas": 321
+      },
+      "hora_estimada": "17:11"
+    },
+    {
+      "n": 6,
+      "tipo": "historia_vuelo",
+      "vuelo": "Air Europa UX025",
+      "destino": "Santa Cruz de la Sierra (Bolivia)",
+      "salida_programada": "23:35",
+      "cambios_hora_estimada": 21,
+      "retraso_final_min": 119,
+      "hitos": [
+        {
+          "hora": "11:51",
+          "hito": "Abren los mostradores 211-222"
+        },
+        {
+          "hora": "19:01",
+          "hito": "Primer aviso de retraso: sale a las 00:37"
+        },
+        {
+          "hora": "22:21",
+          "hito": "Asignada la puerta B29"
+        },
+        {
+          "hora": "00:01",
+          "hito": "Embarcando"
+        },
+        {
+          "hora": "00:41",
+          "hito": "Última llamada"
+        },
+        {
+          "hora": "01:01",
+          "hito": "Cerrado"
+        }
+      ],
+      "horas_estimadas": [
+        "00:37",
+        "00:17",
+        "23:56",
+        "23:35",
+        "23:56",
+        "23:35",
+        "00:45",
+        "23:39",
+        "01:00",
+        "23:53",
+        "23:37",
+        "23:35",
+        "23:54",
+        "23:53",
+        "23:54",
+        "23:53",
+        "23:54",
+        "23:59",
+        "00:30",
+        "00:50",
+        "01:34"
+      ],
+      "vistas_a": [
+        "19:01",
+        "19:11",
+        "19:21",
+        "19:51",
+        "20:01",
+        "20:09",
+        "20:21",
+        "20:31",
+        "20:41",
+        "20:51",
+        "21:11",
+        "21:21",
+        "21:31",
+        "21:41",
+        "22:01",
+        "22:11",
+        "22:21",
+        "22:31",
+        "23:51",
+        "01:01",
+        "01:41"
+      ]
+    },
+    {
+      "n": 7,
+      "tipo": "aviso_tardio",
+      "salidas_con_aviso_retraso": 348,
+      "avisadas_tarde": 199,
+      "pct": 57,
+      "nota": "El pipeline consulta el panel cada 10 minutos"
+    },
+    {
+      "n": 8,
+      "tipo": "destinos",
+      "top": [
+        {
+          "iata": "PMI",
+          "ciudad": "Palma de Mallorca",
+          "salidas": 22
+        },
+        {
+          "iata": "BCN",
+          "ciudad": "Barcelona",
+          "salidas": 18
+        },
+        {
+          "iata": "FCO",
+          "ciudad": "Roma-Fiumicino",
+          "salidas": 18
+        },
+        {
+          "iata": "LIS",
+          "ciudad": "Lisboa",
+          "salidas": 18
+        },
+        {
+          "iata": "LPA",
+          "ciudad": "Gran Canaria",
+          "salidas": 18
+        }
+      ],
+      "paises": 61,
+      "pct_internacional": 69,
+      "mas_lejano": {
+        "iata": "NRT",
+        "ciudad": "Tokio-Narita",
+        "km": 10770
+      }
+    },
+    {
+      "n": 9,
+      "tipo": "curiosidad",
+      "id": "codigos_compartidos",
+      "texto": "2.402 números de vuelo despegaron en solo 622 aviones",
+      "valores": {
+        "numeros_vuelo": 2402,
+        "salidas": 622
+      },
+      "ejemplo": {
+        "hora": "15:45",
+        "destino": "Florencia",
+        "vuelos": [
+          "IB5329",
+          "VY1497",
+          "QR8153",
+          "AA8865"
+        ]
+      }
+    },
+    {
+      "n": 10,
+      "tipo": "cierre",
+      "metodologia": [
+        "Retraso estimado publicado en el panel, no la hora real de despegue",
+        "Puntual = 15 minutos o menos de retraso",
+        "Los códigos compartidos se cuentan como una sola salida"
+      ],
+      "fuente": "Panel de salidas de AENA, consultado cada 10 minutos. Cuenta no oficial."
+    }
+  ]
+}
